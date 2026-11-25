@@ -11,4 +11,11 @@ export default defineConfig({
   },
   server: { port: 4321, host: true },
   devToolbar: { enabled: false },
+  vite: {
+    build: {
+      // tell the CSS minifier we ship to Safari too: otherwise esbuild folds
+      // `backdrop-filter` + `-webkit-backdrop-filter` into the -webkit- one only and Chrome loses all glass
+      cssTarget: ['chrome105', 'edge105', 'firefox110', 'safari15', 'ios15'],
+    },
+  },
 });

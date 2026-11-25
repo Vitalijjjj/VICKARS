@@ -111,13 +111,15 @@ const deal = [0, 2, 1];   // dealing order: left, right, then the featured one i
   .tf__tabs button.is-on { background: var(--cream); color: var(--dk); }
 
   /* ---------- the deck */
-  .deck { --w: 360px; --dx: 250px; --rot: 9deg; --drop: 30px; position: relative; overflow: visible; width: 100%; max-width: 1100px; height: 440px; margin: 0 auto; clip-path: inset(-400px -100vw -30px -100vw); }
+  .deck { --w: 360px; --dx: 250px; --rot: 9deg; --drop: 30px; position: relative; overflow: visible; width: 100%; max-width: 1100px; height: 470px; margin: 0 auto; overflow-x: visible; overflow-y: clip; }
+  /* overflow (not clip-path) hides the tickets rising from below: a clip-path would make the deck a backdrop root and the
+     tickets' glass could no longer blur the glow behind the section */
   .deck[hidden] { display: none; }
   .tk {
     --n: 14px; --foot: 100px;
-    position: absolute; left: 50%; top: 24px; width: var(--w); display: grid; gap: 20px; padding: 28px; border-radius: 24px; color: #fff; cursor: pointer; outline: none; overflow: hidden;
+    position: absolute; left: 50%; top: 52px; width: var(--w); display: grid; gap: 20px; padding: 28px; border-radius: 24px; color: #fff; cursor: pointer; outline: none; overflow: hidden;
     background: linear-gradient(130deg, rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.05) 45%, rgb(255 255 255 / 0.12)), rgb(30 26 23 / 0.2);
-    backdrop-filter: blur(26px) saturate(1.6); -webkit-backdrop-filter: blur(26px) saturate(1.6);
+    -webkit-backdrop-filter: blur(26px) saturate(1.6); backdrop-filter: blur(26px) saturate(1.6);
     box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), inset 0 0 0 1px rgb(255 255 255 / 0.18);
     mask: radial-gradient(circle var(--n) at 0 calc(100% - var(--foot)), #0000 97%, #000), radial-gradient(circle var(--n) at 100% calc(100% - var(--foot)), #0000 97%, #000);
     mask-composite: intersect;
@@ -164,7 +166,7 @@ const deal = [0, 2, 1];   // dealing order: left, right, then the featured one i
 
   /* ---------- booking pop-up */
   .bk { width: min(820px, calc(100% - 24px)); max-width: none; max-height: calc(100dvh - 24px); padding: 0; border: 0; background: none; color: #fff; overflow: visible; }
-  .bk::backdrop { background: rgb(12 10 9 / 0.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .bk::backdrop { background: rgb(12 10 9 / 0.55); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
   .bk[open] { animation: bk-in 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
   .bk[open]::backdrop { animation: bk-fade 0.4s ease; }
   @keyframes bk-in { from { opacity: 0; transform: translateY(60px) scale(0.96); } }
@@ -172,7 +174,7 @@ const deal = [0, 2, 1];   // dealing order: left, right, then the featured one i
   .bk__card {
     position: relative; display: grid; grid-template-columns: 0.9fr 1.1fr; border-radius: 28px; overflow: hidden;
     background: linear-gradient(130deg, rgb(255 255 255 / 0.16), rgb(255 255 255 / 0.04) 45%, rgb(255 255 255 / 0.1)), rgb(28 24 21 / 0.72);
-    backdrop-filter: blur(30px) saturate(1.5); -webkit-backdrop-filter: blur(30px) saturate(1.5);
+    -webkit-backdrop-filter: blur(30px) saturate(1.5); backdrop-filter: blur(30px) saturate(1.5);
     box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5), inset 0 0 0 1px rgb(255 255 255 / 0.16), 0 40px 100px rgb(0 0 0 / 0.5);
   }
   .bk__card:has(.bk__tk[hidden]) { grid-template-columns: 1fr; }
@@ -202,7 +204,7 @@ const deal = [0, 2, 1];   // dealing order: left, right, then the featured one i
   .tf__or a { color: var(--cream); border-bottom: 1px solid currentColor; }
 
   @media (max-width: 900px) {
-    .deck { --w: 290px; --dx: 46px; --rot: 7deg; --drop: 16px; height: 440px; }
+    .deck { --w: 290px; --dx: 46px; --rot: 7deg; --drop: 16px; height: 470px; }
     .tk { padding: 24px; }
     .tk h3 { font-size: 34px; }
     .bk__card { grid-template-columns: 1fr; }
