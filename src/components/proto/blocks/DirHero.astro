@@ -4,13 +4,14 @@
  *  in over it once it can play. Giant caps title, glass fact chips, CTA to the packages. */
 interface Props { code: string; title: string; lead: string; image: string; video?: string; facts: [string, string][]; isNew?: boolean }
 const { code, title, lead, image, video, facts, isNew = false } = Astro.props;
+import { srcset } from '@/lib/img';
 const arrow = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 ---
 
 <section class="dh" data-bg="#1d1815" data-theme="dark">
   {isNew && <span class="pt-new">Новий · перший екран з відео</span>}
   <div class="dh__media" data-zoom>
-    <img class="dh__img" src={image} alt="" fetchpriority="high" decoding="async" />
+    <img class="dh__img" src={image} srcset={srcset(image)} sizes="100vw" alt="" fetchpriority="high" decoding="async" />
     {video && <video class="dh__video" src={video} muted loop playsinline autoplay disablepictureinpicture aria-hidden="true" data-dh-video></video>}
   </div>
   <div class="dh__in">

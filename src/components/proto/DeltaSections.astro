@@ -7,6 +7,7 @@
 import badge from '@/assets/brand/vikcars-badge.svg?raw';
 import { business } from '@/config/business';
 import '@/styles/proto.css';
+import { srcset } from '@/lib/img';
 import SelfWashScrub from './blocks/SelfWashScrub.astro';
 import Ambience from './blocks/Ambience.astro';
 import Benefits from './blocks/Benefits.astro';
@@ -52,7 +53,7 @@ const arrow = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4.
   <!-- the photo stops (pinned) and the glass footer rides up over it on the last scroll -->
   <section class="dl-place" data-bg="#151a19" data-theme="dark" data-place>
     <div class="dl-place__stage" data-place-stage>
-      <img class="dl-place__bg" src={img('level-lounge-showroom-v2')} alt="" loading="lazy" decoding="async" data-place-img />
+      <img class="dl-place__bg" src={img('level-lounge-showroom-v2')} srcset={srcset(img('level-lounge-showroom-v2'))} sizes="100vw" alt="" loading="lazy" decoding="async" data-place-img />
       <div class="dl-place__title" data-place-title>
         <p class="dl-eyebrow">Детейлінг-центр · Лімасол</p>
         <h2 class="dl-display" data-lines><span class="ln"><span><small>Перший</small> на Кіпрі</span></span></h2>

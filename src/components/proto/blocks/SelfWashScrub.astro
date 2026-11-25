@@ -29,7 +29,8 @@ const ic: Record<string, string> = {
 
 <section class:list={['swk', { 'has-intro': intro }]} id="self-wash" data-bg="#1d1815" data-theme="dark" data-swk data-intro={intro ? '1' : undefined}>
   <div class="swk__stage">
-    <video class="swk__video" src="/media/selfwash-scrub-v1.mp4" poster="/media/selfwash-scrub-v1-poster.webp" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true" data-swk-video></video>
+    <!-- the file (unchanged) is fetched only when the scene is about half a screen away -->
+    <video class="swk__video" data-src="/media/selfwash-scrub-v1.mp4" poster="/media/selfwash-scrub-v1-poster.webp" muted playsinline preload="none" disablepictureinpicture aria-hidden="true" data-swk-video></video>
     <i class="swk__shade" aria-hidden="true"></i>
 
     <div class="swk__hud">
@@ -143,6 +144,10 @@ const ic: Record<string, string> = {
   gsap.registerPlugin(ScrollTrigger);
   document.querySelectorAll<HTMLElement>('[data-swk]').forEach((root) => {
     const video = root.querySelector<HTMLVideoElement>('[data-swk-video]')!;
+    new IntersectionObserver(([e], o) => {
+      if (!e.isIntersecting) return; o.disconnect();
+      video.preload = 'auto'; video.src = video.dataset.src!; video.load();
+    }, { rootMargin: '60% 0px' }).observe(root);
     const names = Array.from(root.querySelectorAll<HTMLElement>('[data-swk-name]'));
     const dots = Array.from(root.querySelectorAll<HTMLElement>('[data-swk-dot]'));
     const time = root.querySelector<HTMLElement>('[data-swk-time]')!, bill = root.querySelector<HTMLElement>('[data-swk-bill]')!, end = root.querySelector<HTMLElement>('[data-swk-end]')!;

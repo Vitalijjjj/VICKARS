@@ -16,7 +16,7 @@ const { locale } = Astro.props;
 
 <!-- UA runs the new design (blocks + glass footer inside DeltaSections); RU/EL keep the previous sections
      until the new copy is translated. -->
-<BaseLayout locale={locale} path="/" footer={locale !== 'uk'}>
+<BaseLayout locale={locale} path="/" footer={locale !== 'uk'} preload="/media/vikcars-render-v3-1.webp">
   <CinemaStage locale={locale} />
   {locale === 'uk' ? <DeltaSections /> : <HomeSections locale={locale} />}
 </BaseLayout>

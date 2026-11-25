@@ -3,6 +3,8 @@ import '@/styles/global.css';
 import LiquidGlassHeader from '@/components/header/LiquidGlassHeader.astro';
 import SiteFooter from '@/components/SiteFooter.astro';
 import { locales, localePath, useTranslations, type Locale } from '@/i18n/ui';
+import { srcset } from '@/lib/img';
+import interCyr from '@fontsource-variable/inter-tight/files/inter-tight-cyrillic-wght-normal.woff2?url';
 
 interface Props {
   locale: Locale;
@@ -13,7 +15,7 @@ interface Props {
   noindex?: boolean;
 }
 
-const { locale, path = '/', title, preload = '/media/vikcars-render-v3-1.png', footer = true, noindex = false } = Astro.props;
+const { locale, path = '/', title, preload, footer = true, noindex = false } = Astro.props;
 const t = useTranslations(locale);
 const htmlLang = { uk: 'uk', ru: 'ru', el: 'el' }[locale];
 ---
@@ -29,7 +31,9 @@ const htmlLang = { uk: 'uk', ru: 'ru', el: 'el' }[locale];
     <meta name="description" content={t('meta.description')} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     {locales.map((l) => <link rel="alternate" hreflang={l} href={new URL(localePath(l, path), Astro.site)} />)}
-    <link rel="preload" href={preload} as="image" fetchpriority="high" />
+    {preload && <link rel="preload" href={preload} as="image" fetchpriority="high" imagesrcset={srcset(preload)} imagesizes="100vw" />}
+    <!-- the UI font (Cyrillic, upright) is needed on every UA/RU page above the fold -->
+    <link rel="preload" href={interCyr} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231b1a17'/%3E%3Cpath d='M7 10l3.2 12L16 12l5.8 10L25 10' fill='none' stroke='%23faf2e9' stroke-width='2.2' stroke-linejoin='round'/%3E%3C/svg%3E" />
   </head>
   <body>

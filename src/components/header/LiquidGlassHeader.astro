@@ -25,7 +25,6 @@ const secondary = sections.filter((s) => !s.primary);
 const grouped = navGroups.map((g) => ({ g, label: t(navGroupLabel[g]), items: sections.filter((s) => s.group === g) }));
 const soon = t('state.soon');
 import badge from '@/assets/brand/vikcars-badge.svg?raw';
-import MusicToggle from './MusicToggle.astro';
 ---
 
 <header class="lgh" data-lgh>
@@ -76,8 +75,6 @@ import MusicToggle from './MusicToggle.astro';
         </li>
       </ul>
     </nav>
-
-    <MusicToggle />
 
     <div class="lgh__lang" role="group" aria-label={t('nav.language')}>
       {locales.map((l) => (

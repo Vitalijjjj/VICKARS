@@ -1,4 +1,5 @@
 ---
+import { srcset } from '@/lib/img';
 /** NEW · Кейси (до / після). Light. Case tabs + a draggable before/after slider. In the mockup the "before"
  *  side is the same photo with a grime filter — real before/after shots will replace it. */
 interface Props { cases: { name: string; service: string; time: string; image: string; note: string }[]; isNew?: boolean }
@@ -19,8 +20,8 @@ const { cases, isNew = true } = Astro.props;
   {cases.map((c, i) => (
     <div class="cs__case" data-cs-case={i} hidden={i !== 0}>
       <div class="cs__ba" style="--p:50%" data-cs-ba>
-        <img class="cs__after" src={c.image} alt={`${c.name} — після`} loading="lazy" draggable="false" />
-        <div class="cs__before"><img src={c.image} alt={`${c.name} — до`} loading="lazy" draggable="false" /></div>
+        <img class="cs__after" src={c.image} srcset={srcset(c.image)} sizes="(max-width: 900px) 100vw, 90vw" alt={`${c.name} — після`} loading="lazy" draggable="false" />
+        <div class="cs__before"><img src={c.image} srcset={srcset(c.image)} sizes="(max-width: 900px) 100vw, 90vw" alt={`${c.name} — до`} loading="lazy" draggable="false" /></div>
         <span class="cs__lbl cs__lbl--b">До</span><span class="cs__lbl cs__lbl--a">Після</span>
         <span class="cs__handle" aria-hidden="true"><i>‹ ›</i></span>
         <input type="range" min="0" max="100" value="50" aria-label="Порівняти до і після" data-cs-range />

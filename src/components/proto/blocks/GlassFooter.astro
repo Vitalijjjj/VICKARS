@@ -2,6 +2,7 @@
 /** Footer for prototype pages: full-bleed photo with a glass panel (same as the Delta home ending). */
 import badge from '@/assets/brand/vikcars-badge.svg?raw';
 import { business } from '@/config/business';
+import { srcset } from '@/lib/img';
 interface Props { image?: string }
 const { image = '/media/level-lounge-showroom-v2.webp' } = Astro.props;
 const tel = business.phone ? `tel:${business.phone.replace(/\s/g, '')}` : '#';
@@ -9,7 +10,7 @@ const tel = business.phone ? `tel:${business.phone.replace(/\s/g, '')}` : '#';
 
 <!-- the photo stops (pinned) and the glass footer rides up over it on the last scroll -->
 <section class="gf" data-bg="#151a19" data-theme="dark" data-gf>
-  <div class="gf__stage" data-gf-stage><img class="gf__bg" src={image} alt="" loading="lazy" decoding="async" data-gf-img /></div>
+  <div class="gf__stage" data-gf-stage><img class="gf__bg" src={image} srcset={srcset(image)} sizes="100vw" alt="" loading="lazy" decoding="async" data-gf-img /></div>
   <i class="gf__gap" aria-hidden="true"></i>
   <footer class="gf__glass" data-gf-foot>
     <div class="gf__brand"><span set:html={badge} /><p>Преміум-мийка<br />та детейлінг</p></div>

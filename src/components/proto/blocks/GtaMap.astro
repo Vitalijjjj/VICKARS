@@ -5,7 +5,6 @@
  * pointer and rests on the VIK blip; colour icons mark real places nearby; a purple GPS route runs from the Old Port
  * to VIK Cars (OSRM, live). Tiles: Esri Dark Gray Canvas. Wheel-zoom is off so the page scroll is never hijacked.
  */
-import 'leaflet/dist/leaflet.css';
 import badge from '@/assets/brand/vikcars-badge.svg?raw';
 import { business } from '@/config/business';
 const { lat, lng } = business.geo;
@@ -20,7 +19,7 @@ const pois: [number, number, string, string, string][] = [
 ---
 
 <div class="gm" data-gm data-lat={lat} data-lng={lng} data-from-lat={from.lat} data-from-lng={from.lng} data-pois={JSON.stringify(pois)}>
-  <div class="gm__scene" aria-hidden="true"><img src="/media/level-lounge-showroom-v2.webp" alt="" loading="lazy" /></div>
+  <div class="gm__scene" aria-hidden="true"><img src="/media/level-lounge-showroom-v2-sm.webp" alt="" loading="lazy" /></div>
   <div class="gm__map" data-gm-map aria-label="Карта: маршрут від Старого порту до VIK Cars" role="img"></div>
   <i class="gm__vignette" aria-hidden="true"></i>
 
@@ -146,13 +145,14 @@ const pois: [number, number, string, string, string][] = [
 </style>
 
 <script>
-  import L from 'leaflet';
+  import type * as Leaflet from 'leaflet';
+  // Leaflet (+ its CSS) is fetched only when the map comes near the screen
+  let L: typeof Leaflet;
   const BASE = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
   const PURPLE = '#a35cff';
 
   document.querySelectorAll<HTMLElement>('[data-gm]').forEach((root) => {
-    const to = L.latLng(Number(root.dataset.lat), Number(root.dataset.lng));
-    const from = L.latLng(Number(root.dataset.fromLat), Number(root.dataset.fromLng));
+    const ll = () => ({ to: L.latLng(Number(root.dataset.lat), Number(root.dataset.lng)), from: L.latLng(Number(root.dataset.fromLat), Number(root.dataset.fromLng)) });
     const pois = JSON.parse(root.dataset.pois || '[]') as [number, number, string, string, string][];
     const badge = (root.querySelector('template[data-gm-badge]') as HTMLTemplateElement).innerHTML;
     const cross = root.querySelector<HTMLElement>('[data-gm-cross]')!;
@@ -161,6 +161,9 @@ const pois: [number, number, string, string, string][] = [
 
     const build = async () => {
       if (built) return; built = true;
+      const [mod] = await Promise.all([import('leaflet'), import('leaflet/dist/leaflet.css')]);
+      L = (mod as unknown as { default?: typeof Leaflet }).default ?? (mod as unknown as typeof Leaflet);
+      const { to, from } = ll();
       const map = L.map(root.querySelector<HTMLElement>('[data-gm-map]')!, { zoomControl: false, attributionControl: false, scrollWheelZoom: false, zoomSnap: 0.25 });
       L.tileLayer(BASE, { maxZoom: 16, className: 'gm-base' }).addTo(map);
 
@@ -177,8 +180,8 @@ const pois: [number, number, string, string, string][] = [
         requestAnimationFrame(() => requestAnimationFrame(() => { path.style.transition = 'stroke-dashoffset 2.4s cubic-bezier(.22,1,.36,1)'; path.style.strokeDashoffset = '0'; }));
       };
       map.on('zoomstart', () => { const path = (main as unknown as { _path?: SVGPathElement })._path; if (path) { path.style.transition = 'none'; path.style.strokeDasharray = 'none'; } });
-      const route = async (origin: L.LatLng) => {
-        let line: L.LatLng[] = [origin, to];
+      const route = async (origin: Leaflet.LatLng) => {
+        let line: Leaflet.LatLng[] = [origin, to];
         try {
           const r = await fetch(`https://router.project-osrm.org/route/v1/driving/${origin.lng},${origin.lat};${to.lng},${to.lat}?overview=full&geometries=geojson`);
           const rt = (await r.json()).routes?.[0];

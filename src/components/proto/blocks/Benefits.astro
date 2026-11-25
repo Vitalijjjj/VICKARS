@@ -17,6 +17,7 @@ const {
     ['Гарантія на захист', 'PPF і кераміка — з гарантійним талоном і графіком догляду.', 'shield'],
   ],
 } = Astro.props;
+import { srcset } from '@/lib/img';
 const fallback = ['cam', 'cup', 'user', 'clock', 'tag', 'shield'];
 const ic: Record<string, string> = {
   cam: '<rect x="3" y="7" width="18" height="13" rx="3"/><circle cx="12" cy="13.5" r="3.5"/><path d="M8.5 7l1.5-3h4l1.5 3"/>',
@@ -43,7 +44,7 @@ const ic: Record<string, string> = {
   {isNew && <span class="pt-new">Новий блок · Що ви отримаєте</span>}
   <div class="bn__stage" data-bn-stage>
     <!-- the photo opens from a rounded card to full-bleed on the way in and folds back on the way out -->
-    <div class="bn__media" data-bn-media><img class="bn__bg" src={image} alt="" loading="lazy" decoding="async" /></div>
+    <div class="bn__media" data-bn-media><img class="bn__bg" src={image} srcset={srcset(image)} sizes="142vw" alt="" loading="lazy" decoding="async" /></div>
     <div class="bn__in">
       <header class="bn__head">
         <h2 class="bn__title" data-lines><span class="ln"><span class="bn__t1">Що ви</span></span><span class="ln"><span class="bn__t2">отримаєте</span></span></h2>
