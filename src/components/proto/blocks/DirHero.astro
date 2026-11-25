@@ -1,0 +1,55 @@
+---
+/** Direction page — first screen. The level still is the base layer and carries `view-transition-name: level-window`,
+ *  so the building → level transition from the home page lands on the same picture; an optional video loop fades
+ *  in over it once it can play. Giant caps title, glass fact chips, CTA to the packages. */
+interface Props { code: string; title: string; lead: string; image: string; video?: string; facts: [string, string][]; isNew?: boolean }
+const { code, title, lead, image, video, facts, isNew = false } = Astro.props;
+const arrow = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+---
+
+<section class="dh" data-bg="#1d1815" data-theme="dark">
+  {isNew && <span class="pt-new">Новий · перший екран з відео</span>}
+  <div class="dh__media" data-zoom>
+    <img class="dh__img" src={image} alt="" fetchpriority="high" decoding="async" />
+    {video && <video class="dh__video" src={video} muted loop playsinline autoplay disablepictureinpicture aria-hidden="true" data-dh-video></video>}
+  </div>
+  <div class="dh__in">
+    <p class="dh__code"><span class="dl-num">{code}</span></p>
+    <h1 class="dl-display" data-lines><span class="ln"><span>{title}</span></span></h1>
+    <p class="dl-lead dl-lead--c" data-up>{lead}</p>
+    <div class="dl-cta dl-cta--c" data-up><a class="dl-pill" href="#pricing">Записатися</a><a class="dl-round" href="#pricing" aria-label="Записатися" set:html={arrow} /></div>
+  </div>
+  <ul class="dh__facts" data-up>
+    {facts.map(([b, t]) => <li class="dl-glass-card"><b>{b}</b><span>{t}</span></li>)}
+  </ul>
+</section>
+
+<style>
+  .dh { position: relative; height: 100vh; height: 100svh; min-height: 640px; overflow: hidden; display: grid; place-items: center; }
+  .dh__media { position: absolute; inset: 0; view-transition-name: level-window; }
+  .dh__img, .dh__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .dh__video { opacity: 0; transition: opacity 1.2s ease; }
+  .dh__video.is-on { opacity: 1; }
+  .dh::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgb(29 24 21 / 0.55), rgb(29 24 21 / 0.42) 45%, var(--dk) 100%); }
+  .dh__in { position: relative; z-index: 2; display: grid; justify-items: center; gap: 26px; padding: 0 var(--gutter); margin-top: -6vh; }
+  .dh__code { margin: 0; }
+  .dh__code .dl-num { font-size: 30px; }
+  .dh h1 { view-transition-name: level-title; }
+  .dh__facts { position: absolute; z-index: 2; left: var(--gutter); right: var(--gutter); bottom: 28px; display: flex; justify-content: center; gap: 10px; margin: 0; padding: 0; list-style: none; }
+  .dh__facts li { display: flex; align-items: baseline; gap: 10px; padding: 14px 20px; border-radius: 999px; }
+  .dh__facts b { font-size: 24px; font-weight: 200; font-style: italic; letter-spacing: -0.03em; }
+  .dh__facts span { font-size: 14px; color: var(--cream-2); }
+  @media (max-width: 900px) {
+    .dh__facts { flex-wrap: wrap; }
+    .dh__facts li { padding: 10px 14px; }
+    .dh__facts b { font-size: 18px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .dh__video { display: none; } }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLVideoElement>('[data-dh-video]').forEach((v) => {
+    const on = () => v.classList.add('is-on');
+    if (v.readyState >= 3) on(); else v.addEventListener('canplay', on, { once: true });
+  });
+</script>

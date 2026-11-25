@@ -1,0 +1,84 @@
+---
+/** NEW · Кейси (до / після). Light. Case tabs + a draggable before/after slider. In the mockup the "before"
+ *  side is the same photo with a grime filter — real before/after shots will replace it. */
+interface Props { cases: { name: string; service: string; time: string; image: string; note: string }[]; isNew?: boolean }
+const { cases, isNew = true } = Astro.props;
+---
+
+<section class="cs dl-sec" data-bg="#f6e4d6" data-theme="light" data-cs>
+  {isNew && <span class="pt-new">Новий блок · Кейси до/після</span>}
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+    <filter id="grime"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="4" /><feColorMatrix values="0 0 0 0 0.33  0 0 0 0 0.27  0 0 0 0 0.2  0 0 0 0.95 0" /><feComposite in2="SourceGraphic" operator="in" /><feBlend in="SourceGraphic" mode="multiply" /></filter>
+  </svg>
+  <header class="cs__head">
+    <h2 class="dl-serif" data-up>Кейси:<br /><em>до</em> і після</h2>
+    <div class="cs__tabs" role="tablist" data-up>
+      {cases.map((c, i) => <button type="button" role="tab" class:list={{ 'is-on': i === 0 }} aria-selected={i === 0 ? 'true' : 'false'} data-cs-tab={i}>{c.name}</button>)}
+    </div>
+  </header>
+  {cases.map((c, i) => (
+    <div class="cs__case" data-cs-case={i} hidden={i !== 0}>
+      <div class="cs__ba" style="--p:50%" data-cs-ba>
+        <img class="cs__after" src={c.image} alt={`${c.name} — після`} loading="lazy" draggable="false" />
+        <div class="cs__before"><img src={c.image} alt={`${c.name} — до`} loading="lazy" draggable="false" /></div>
+        <span class="cs__lbl cs__lbl--b">До</span><span class="cs__lbl cs__lbl--a">Після</span>
+        <span class="cs__handle" aria-hidden="true"><i>‹ ›</i></span>
+        <input type="range" min="0" max="100" value="50" aria-label="Порівняти до і після" data-cs-range />
+      </div>
+      <dl class="cs__meta" data-up>
+        <div><dt>Послуга</dt><dd>{c.service}</dd></div>
+        <div><dt>Час</dt><dd>{c.time}</dd></div>
+        <div><dt>Що зробили</dt><dd>{c.note}</dd></div>
+      </dl>
+    </div>
+  ))}
+  <p class="pt-draft cs__draft">«До» імітоване фільтром — під кожен кейс знімемо справжні фото до і після</p>
+</section>
+
+<style>
+  .cs__head { display: flex; justify-content: space-between; align-items: end; gap: 32px; margin-bottom: clamp(32px, 4vw, 56px); }
+  .cs__head h2 em { font-style: italic; font-weight: 200; color: var(--accent); }
+  .cs__tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+  .cs__tabs button { height: 42px; padding: 0 18px; border: 0; border-radius: 999px; font: 500 14px var(--font-sans); color: var(--ink); background: rgb(36 28 23 / 0.06); cursor: pointer; transition: background 0.3s, color 0.3s; }
+  .cs__tabs button.is-on { background: var(--dk); color: var(--cream); }
+  .cs__case[hidden] { display: none; }
+  .cs__ba { position: relative; aspect-ratio: 16 / 8; border-radius: 22px; overflow: hidden; user-select: none; touch-action: pan-y; }
+  .cs__ba img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .cs__before { position: absolute; inset: 0; clip-path: inset(0 calc(100% - var(--p)) 0 0); }
+  .cs__before img { filter: url(#grime) saturate(0.4) brightness(0.74) contrast(0.8) sepia(0.45) blur(0.4px); }
+  .cs__lbl { position: absolute; top: 18px; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #fff; background: rgb(20 17 15 / 0.45); backdrop-filter: blur(12px); }
+  .cs__lbl--b { left: 18px; } .cs__lbl--a { right: 18px; }
+  .cs__handle { position: absolute; top: 0; bottom: 0; left: var(--p); width: 2px; translate: -1px 0; background: #fff; pointer-events: none; }
+  .cs__handle i { position: absolute; top: 50%; left: 50%; translate: -50% -50%; display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; font-style: normal; font-size: 16px; letter-spacing: 2px; color: #fff; background: rgb(255 255 255 / 0.18); backdrop-filter: blur(14px); box-shadow: inset 0 0 0 1.5px #fff; }
+  .cs__ba input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0; }
+  .cs__meta { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 24px; margin: 28px 0 0; }
+  .cs__meta div { display: grid; gap: 6px; padding-top: 16px; border-top: 1px solid rgb(36 28 23 / 0.14); }
+  .cs__meta dt { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
+  .cs__meta dd { margin: 0; font-size: 18px; letter-spacing: -0.02em; color: var(--ink); }
+  .cs__draft { margin: 20px 0 0; color: var(--ink-2); }
+  @media (max-width: 900px) {
+    .cs__head { flex-direction: column; align-items: start; }
+    .cs__ba { aspect-ratio: 4 / 5; }
+    .cs__meta { grid-template-columns: 1fr 1fr; }
+    .cs__meta div:last-child { grid-column: 1 / -1; }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-cs]').forEach((cs) => {
+    cs.querySelectorAll<HTMLInputElement>('[data-cs-range]').forEach((r) => {
+      const ba = r.closest<HTMLElement>('[data-cs-ba]')!;
+      r.addEventListener('input', () => ba.style.setProperty('--p', `${r.value}%`));
+    });
+    cs.querySelectorAll<HTMLButtonElement>('[data-cs-tab]').forEach((b) => b.addEventListener('click', () => {
+      cs.querySelectorAll('[data-cs-tab]').forEach((x) => { x.classList.toggle('is-on', x === b); x.setAttribute('aria-selected', String(x === b)); });
+      cs.querySelectorAll<HTMLElement>('[data-cs-case]').forEach((c) => { c.hidden = c.dataset.csCase !== b.dataset.csTab; c.querySelectorAll<HTMLElement>('[data-up]').forEach((u) => (u.style.opacity = '1')); });
+    }));
+    // a hint: the divider glides once when the slider first comes into view
+    const first = cs.querySelector<HTMLElement>('[data-cs-ba]');
+    if (first && !matchMedia('(prefers-reduced-motion: reduce)').matches) new IntersectionObserver(([e], o) => {
+      if (!e.isIntersecting) return; o.disconnect();
+      let t0 = 0; const run = (t: number) => { t0 ||= t; const k = Math.min(1, (t - t0) / 1600); const v = 50 + Math.sin(k * Math.PI * 2) * 22 * (1 - k); first.style.setProperty('--p', `${v}%`); if (k < 1) requestAnimationFrame(run); }; requestAnimationFrame(run);
+    }, { threshold: 0.6 }).observe(first);
+  });
+</script>

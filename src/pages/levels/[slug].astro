@@ -1,0 +1,12 @@
+---
+/** UA direction pages in the new design. RU/EL keep LevelPage until the new copy is translated. */
+import DirectionPage, { type DirSlug } from '@/components/proto/DirectionPage.astro';
+import { levels } from '@/config/building';
+
+export function getStaticPaths() {
+  return levels.map((l) => ({ params: { slug: l.slug } }));
+}
+const { slug } = Astro.params;
+---
+
+<DirectionPage slug={slug as DirSlug} />

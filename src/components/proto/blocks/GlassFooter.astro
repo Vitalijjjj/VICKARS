@@ -1,0 +1,68 @@
+---
+/** Footer for prototype pages: full-bleed photo with a glass panel (same as the Delta home ending). */
+import badge from '@/assets/brand/vikcars-badge.svg?raw';
+import { business } from '@/config/business';
+interface Props { image?: string }
+const { image = '/media/level-lounge-showroom-v2.webp' } = Astro.props;
+const tel = business.phone ? `tel:${business.phone.replace(/\s/g, '')}` : '#';
+---
+
+<!-- the photo stops (pinned) and the glass footer rides up over it on the last scroll -->
+<section class="gf" data-bg="#151a19" data-theme="dark" data-gf>
+  <div class="gf__stage" data-gf-stage><img class="gf__bg" src={image} alt="" loading="lazy" decoding="async" data-gf-img /></div>
+  <i class="gf__gap" aria-hidden="true"></i>
+  <footer class="gf__glass" data-gf-foot>
+    <div class="gf__brand"><span set:html={badge} /><p>Преміум-мийка<br />та детейлінг</p></div>
+    <nav><b>Напрямки</b><a href="/levels/car-wash/">00 · Ручна мийка</a><a href="/levels/detailing-studio/">−01 · Детейлінг</a><a href="/levels/lounge-showroom/">+01 · Лаунж</a><a href="/levels/self-wash/">Самомийка</a></nav>
+    <nav><b>Сервіс</b><a href="#pricing">Тарифи</a><a href="#reviews">Відгуки</a><a href="/contacts/">Як нас знайти</a></nav>
+    <div class="gf__contact">
+      <small>Телефон</small><a href={tel}>{business.phone}</a>
+      <small>Графік</small><span>Щодня {business.hours}</span>
+      <small>Адреса</small><a href={business.mapsUrl ?? '#'} target="_blank" rel="noopener">Лімасол · маршрут ↗</a>
+    </div>
+    <div class="gf__bar"><span>© 2026 VIK Cars</span><span>UA · RU · EL</span></div>
+  </footer>
+</section>
+
+<style>
+  .gf { position: relative; padding-bottom: var(--gutter); }
+  .gf__stage { position: relative; z-index: 1; height: 100vh; height: 100svh; overflow: hidden; }
+  .gf__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 60%; }
+  .gf__stage::before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, #151a19 0%, rgb(21 26 25 / 0.15) 25%, rgb(0 0 0 / 0.4) 100%); }
+  .gf__gap { display: block; height: 40vh; }
+  .gf__glass {
+    position: relative; z-index: 2; margin: 0 var(--gutter); display: grid; grid-template-columns: 1.2fr 1fr 1fr 1.3fr; gap: 32px; padding: 40px 40px 24px; border-radius: 22px; color: #fff;
+    background: rgb(28 24 21 / 0.28); backdrop-filter: blur(28px) saturate(1.3); -webkit-backdrop-filter: blur(28px) saturate(1.3);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.18), inset 0 1px 0 rgb(255 255 255 / 0.25), 0 40px 80px rgb(0 0 0 / 0.3);
+  }
+  .gf__brand { display: grid; align-content: start; gap: 18px; }
+  .gf__brand span { width: 64px; display: block; }
+  .gf__brand :global(svg) { width: 100%; height: auto; }
+  .gf__brand p { margin: 0; font-size: 14px; color: rgb(255 255 255 / 0.75); line-height: 1.4; }
+  .gf nav { display: grid; align-content: start; gap: 10px; font-size: 15px; }
+  .gf nav b { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+  .gf nav a { color: rgb(255 255 255 / 0.78); }
+  .gf__contact { display: grid; align-content: start; gap: 4px; }
+  .gf__contact small { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgb(255 255 255 / 0.6); margin-top: 10px; }
+  .gf__contact small:first-child { margin-top: 0; }
+  .gf__contact a, .gf__contact span { font-size: 22px; letter-spacing: -0.02em; }
+  .gf__bar { grid-column: 1 / -1; display: flex; justify-content: space-between; padding-top: 18px; border-top: 1px solid rgb(255 255 255 / 0.16); font-size: 12px; color: rgb(255 255 255 / 0.6); }
+  @media (max-width: 900px) {
+    .gf__gap { height: 28vh; }
+    .gf__glass { grid-template-columns: 1fr 1fr; padding: 28px 22px 18px; }
+    .gf__brand, .gf__contact { grid-column: 1 / -1; }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+  document.querySelectorAll<HTMLElement>('[data-gf]').forEach((gf) => {
+    const stage = gf.querySelector<HTMLElement>('[data-gf-stage]')!, foot = gf.querySelector<HTMLElement>('[data-gf-foot]')!;
+    ScrollTrigger.create({ trigger: stage, start: 'top top', endTrigger: gf, end: 'bottom bottom', pin: true, pinSpacing: false });
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    gsap.fromTo(gf.querySelector('[data-gf-img]'), { scale: 1.18 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: gf, start: 'top bottom', end: 'bottom bottom', scrub: true } });
+    gsap.fromTo(foot, { y: 140, scale: 0.94, opacity: 0.2 }, { y: 0, scale: 1, opacity: 1, ease: 'power2.out', scrollTrigger: { trigger: foot, start: 'top bottom', end: 'bottom bottom', scrub: 0.6 } });
+  });
+</script>

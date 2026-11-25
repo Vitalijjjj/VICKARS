@@ -1,0 +1,242 @@
+---
+/**
+ * UA home below the hero, in the client's sitemap order: logo-mask transition · самомийка · наші клієнти ·
+ * CTA форма + тарифи · що ви отримаєте · відгуки Google · CTA + контакти + карта · підвал (glass footer).
+ * Blocks that are not on the home sitemap live on the direction / contacts pages (blocks/Story, Journey, …).
+ */
+import badge from '@/assets/brand/vikcars-badge.svg?raw';
+import { business } from '@/config/business';
+import '@/styles/proto.css';
+import SelfWashScrub from './blocks/SelfWashScrub.astro';
+import Ambience from './blocks/Ambience.astro';
+import Benefits from './blocks/Benefits.astro';
+import Tariffs from './blocks/Tariffs.astro';
+import Reviews from './blocks/Reviews.astro';
+import ContactsMap from './blocks/ContactsMap.astro';
+
+const m = '/media/';
+const img = (n: string, sm = false) => `${m}${n}${sm ? '-sm' : ''}.webp`;
+const tel = business.phone ? `tel:${business.phone.replace(/\s/g, '')}` : '#';
+
+// 3 · garage marquee (placeholders for a real portfolio)
+const rowA = ['level-detailing-studio-v2-s1', 'level-car-wash-v2', 'level-lounge-showroom-v2-s1', 'level-detailing-studio-v2-s2', 'level-car-wash-v2-s3', 'level-detailing-studio-v2', 'level-lounge-showroom-v2-s3'];
+
+const arrow = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+---
+
+<div class="dl" data-dl>
+  <Ambience />
+  <!-- sitemap order: самомийка · наші клієнти · CTA форма + тарифи · що ви отримаєте · відгуки · CTA + контакти + карта · підвал -->
+  <!-- opens from the hero through the VIK shield (intro), then the scroll runs the wash -->
+  <SelfWashScrub intro />
+
+  <!-- ============================================================ 3 · VIK garage: two marquees of finished cars -->
+  <section class="dl-garage" id="clients" data-bg="#1d1815" data-theme="dark">
+    <div class="dl-garage__mid">
+      <h2 class="dl-display dl-display--m" data-lines><span class="ln"><span>Гараж <small>від</small> VIK</span></span></h2>
+      <p class="dl-lead dl-lead--c" data-up>Суперкари, класика й щоденні авто — з однаковим рівнем уваги. Показуємо роботи до і після, з деталями кожного проєкту: плівка, кераміка, тонування, тюнінг.</p>
+      <div class="dl-cta dl-cta--c" data-up><a class="dl-pill" href="#">Портфоліо</a><a class="dl-round dl-round--ghost" href="#" aria-label="Instagram" set:html={'<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 14L14 6M7 6h7v7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'} /></div>
+    </div>
+    <!-- curved «wagon» carousel: cards turn to face the centre like a concave wall; the top/bottom arcs cut the strip -->
+    <div class="dl-marquee" aria-hidden="true" data-curve><div class="dl-marquee__track">{[...rowA, ...rowA].map((s) => <figure><img src={img(s, true)} alt="" loading="lazy" /></figure>)}</div></div>
+  </section>
+
+  <Tariffs isNew={false} />
+  <Benefits isNew={false} />
+  <Reviews isNew={false} />
+
+  <ContactsMap isNew={false} />
+
+  <!-- ============================================================ 8 · full-bleed Limassol + glass footer over it -->
+  <!-- the photo stops (pinned) and the glass footer rides up over it on the last scroll -->
+  <section class="dl-place" data-bg="#151a19" data-theme="dark" data-place>
+    <div class="dl-place__stage" data-place-stage>
+      <img class="dl-place__bg" src={img('level-lounge-showroom-v2')} alt="" loading="lazy" decoding="async" data-place-img />
+      <div class="dl-place__title" data-place-title>
+        <p class="dl-eyebrow">Детейлінг-центр · Лімасол</p>
+        <h2 class="dl-display" data-lines><span class="ln"><span><small>Перший</small> на Кіпрі</span></span></h2>
+      </div>
+    </div>
+    <i class="dl-place__gap" aria-hidden="true"></i>
+    <footer class="dl-glass" data-place-foot>
+      <div class="dl-glass__brand"><span set:html={badge} /><p>Преміум-мийка<br />та детейлінг</p></div>
+      <nav><b>Комплекс</b><a href="/levels/lounge-showroom/">Про комплекс</a><a href="/levels/car-wash/#process">Шлях авто</a><a href="#clients">Гараж VIK</a><a href="/levels/detailing-studio/#journal">Журнал</a></nav>
+      <nav><b>Рівні</b><a href="/levels/car-wash/">00 · Ручна мийка</a><a href="/levels/detailing-studio/">−01 · Детейлінг</a><a href="/levels/lounge-showroom/">+01 · Лаунж</a></nav>
+      <nav><b>Сервіс</b><a href="#pricing">Ціни</a><a href="/levels/detailing-studio/#quiz">Квіз</a><a href="#booking">Запис на огляд</a></nav>
+      <div class="dl-glass__contact">
+        <small>Телефон</small><a href={tel}>{business.phone}</a>
+        <small>Графік</small><span>Щодня {business.hours}</span>
+        <small>Адреса</small><a href={business.mapsUrl ?? '#'} target="_blank" rel="noopener">Лімасол · маршрут ↗</a>
+      </div>
+      <div class="dl-glass__bar"><span>© 2026 VIK Cars</span><span>UA · RU · EL</span></div>
+    </footer>
+  </section>
+</div>
+
+<style>
+  .dl {
+    --dk: #1d1815; --cream: #f4e6d8; --cream-2: rgb(244 230 216 / 0.66); --peach: #f6e4d6; --ink: #241c17; --ink-2: #6a5b50;
+    --mint: #dff3e4;
+    position: relative; background: var(--paper); color: var(--ink); overflow: hidden;
+    font-family: var(--font-sans);
+  }
+  .dl[data-theme='dark'] { color: var(--cream); }
+  .dl { transition: color 0.6s; }
+  .dl-sec { position: relative; padding: clamp(110px, 12vw, 190px) var(--gutter); }
+
+  /* ---------------------------------------------------------- type */
+  .dl-display {
+    margin: 0; font-size: clamp(3rem, 1rem + 7.4vw, 9.6rem); font-weight: 600; line-height: 0.9; letter-spacing: -0.055em;
+    text-transform: uppercase; text-align: center; color: var(--cream);
+  }
+  .dl-display--m { font-size: clamp(2.6rem, 1rem + 5.6vw, 7.4rem); }
+  .dl-display small { font-size: 0.32em; font-weight: 500; letter-spacing: -0.02em; vertical-align: 0.95em; margin: 0 0.12em; }
+  .dl-display .ln { display: block; overflow: hidden; padding: 0.06em 0 0.04em; margin: -0.06em 0 -0.04em; }
+  .dl-display .ln > span { display: inline-block; }
+  .dl-serif { margin: 0; font-size: clamp(2.6rem, 1.4rem + 3.4vw, 5rem); font-weight: 300; line-height: 0.98; letter-spacing: -0.05em; color: var(--ink); }
+  .dl-serif--s { font-size: clamp(1.9rem, 1.2rem + 1.6vw, 2.9rem); }
+  .dl-serif--l { font-size: clamp(2.4rem, 1.2rem + 3.6vw, 5.2rem); text-align: center; }
+  .dl-lead { max-width: 34ch; margin: 0; font-size: clamp(16px, 14px + 0.4vw, 19px); line-height: 1.5; color: var(--cream-2); }
+  .dl-lead--c { margin-inline: auto; text-align: center; }
+  .dl-body { margin: 0; font-size: clamp(16px, 15px + 0.2vw, 18px); line-height: 1.5; color: var(--ink-2); }
+  .dl-eyebrow { margin: 0 0 22px; text-align: center; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--cream-2); }
+  .dl-code { margin: 0 0 6px; font: 600 13px var(--font-sans); color: var(--accent); }
+
+  /* ---------------------------------------------------------- pill + round buttons */
+  .dl-cta { display: inline-flex; align-items: center; gap: 6px; }
+  .dl-cta--c { display: flex; justify-content: center; }
+  .dl-pill { display: inline-flex; align-items: center; height: 48px; padding: 0 24px; border-radius: 999px; background: var(--cream); color: var(--dk); font-size: 15px; font-weight: 500; letter-spacing: -0.01em; transition: background 0.35s, color 0.35s; }
+  .dl-pill:hover { background: #fff; }
+  .dl-pill--light { background: #fff; }
+  .dl-pill--dark { background: var(--dk); color: var(--cream); }
+  .dl-pill--mint { background: var(--mint); }
+  .dl-round { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: var(--dk); color: var(--cream); transition: transform 0.45s var(--ease-out), background 0.35s; }
+  .dl-round :global(svg) { width: 20px; height: 20px; }
+  .dl-round:hover { transform: rotate(-45deg); background: var(--accent); }
+  section[data-theme='dark'] .dl-round:not(.dl-round--accent),
+  .dl-round--ghost { background: rgb(255 255 255 / 0.1); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.22); backdrop-filter: blur(12px); }
+  .dl-round--accent { background: var(--accent); color: #fff; }
+
+  /* ---------------------------------------------------------- 3 garage */
+  .dl-garage { position: relative; padding: clamp(110px, 12vw, 170px) 0 40px; display: grid; gap: clamp(8px, 1.5vw, 24px); }
+  .dl-garage__mid { display: grid; justify-items: center; gap: 28px; padding: 0 var(--gutter); }
+  .dl-marquee { --curve: clamp(40px, 7vw, 110px); position: relative; overflow: hidden; padding: 0; }
+  /* the concave cut: two ellipses subtracted from the strip (a mask, so the ambience shows through cleanly) */
+  .dl-marquee {
+    mask: radial-gradient(58% var(--curve) at 50% 0, #000 99%, #0000 100%), radial-gradient(58% var(--curve) at 50% 100%, #000 99%, #0000 100%), linear-gradient(#000 0 0);
+    mask-composite: exclude, exclude;
+  }
+  .dl-marquee__track { display: flex; gap: 12px; width: max-content; animation: dl-marq 70s linear infinite reverse; }
+  .dl-marquee figure { margin: 0; width: clamp(240px, 26vw, 400px); aspect-ratio: 4 / 5; overflow: hidden; transform-origin: 50% 50%; will-change: transform; }
+  .dl-marquee img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(0.1); }
+  @keyframes dl-marq { to { transform: translateX(-50%); } }
+
+  /* ---------------------------------------------------------- 8 place + glass footer */
+  .dl-place { position: relative; padding-bottom: var(--gutter); }
+  .dl-place__stage { position: relative; z-index: 1; height: 100vh; height: 100svh; overflow: hidden; }
+  .dl-place__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 60%; }
+  .dl-place__stage::before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, #151a19 0%, rgb(21 26 25 / 0.2) 18%, rgb(0 0 0 / 0.1) 50%, rgb(0 0 0 / 0.4) 100%); }
+  .dl-place__title { position: relative; z-index: 2; padding-top: 34vh; }
+  .dl-place__gap { display: block; height: 45vh; }
+  .dl-glass {
+    position: relative; z-index: 3; margin: 0 var(--gutter);
+    display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr 1.3fr; gap: 32px; padding: 40px 40px 24px; border-radius: 22px; color: #fff;
+    background: rgb(28 24 21 / 0.28); backdrop-filter: blur(28px) saturate(1.3); -webkit-backdrop-filter: blur(28px) saturate(1.3);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.18), inset 0 1px 0 rgb(255 255 255 / 0.25), 0 40px 80px rgb(0 0 0 / 0.3);
+  }
+  .dl-glass__brand { display: grid; align-content: start; gap: 18px; }
+  .dl-glass__brand span { width: 64px; display: block; }
+  .dl-glass__brand :global(svg) { width: 100%; height: auto; }
+  .dl-glass__brand p { margin: 0; font-size: 14px; color: rgb(255 255 255 / 0.75); line-height: 1.4; }
+  .dl-glass nav { display: grid; align-content: start; gap: 10px; font-size: 15px; }
+  .dl-glass nav b { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+  .dl-glass nav a { color: rgb(255 255 255 / 0.78); }
+  .dl-glass nav a:hover { color: #fff; }
+  .dl-glass__contact { display: grid; align-content: start; gap: 4px; }
+  .dl-glass__contact small { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgb(255 255 255 / 0.6); margin-top: 10px; }
+  .dl-glass__contact small:first-child { margin-top: 0; }
+  .dl-glass__contact a, .dl-glass__contact span { font-size: 22px; letter-spacing: -0.02em; }
+  .dl-glass__bar { grid-column: 1 / -1; display: flex; justify-content: space-between; padding-top: 18px; border-top: 1px solid rgb(255 255 255 / 0.16); font-size: 12px; color: rgb(255 255 255 / 0.6); }
+
+  :global(html.js) .dl [data-up] { opacity: 0; }
+
+  @media (max-width: 900px) {
+    .dl-marquee figure { width: 62vw; aspect-ratio: 4 / 5.2; }
+    .dl-marquee { --curve: 36px; }
+    .dl-place__title { padding-top: 30vh; }
+    .dl-place__gap { height: 30vh; }
+    .dl-glass { grid-template-columns: 1fr 1fr; padding: 28px 22px 18px; }
+    .dl-glass__brand, .dl-glass__contact { grid-column: 1 / -1; }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+  // the new design runs on the UA home only; elsewhere this script must stay inert
+  const root = document.querySelector<HTMLElement>('[data-dl]') ?? document.createElement('div');
+  const $ = (s: string, r: ParentNode = root) => Array.from(r.querySelectorAll<HTMLElement>(s));
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // smooth light ↔ dark: the wrapper's background follows the section entering the screen
+  const secs = $(':scope > section');
+  let prev = getComputedStyle(root).backgroundColor;
+  secs.forEach((s) => {
+    const to = s.dataset.bg!;
+    const from = prev; prev = to;
+    if (from === to) return;
+    gsap.fromTo(root, { backgroundColor: from }, { backgroundColor: to, ease: 'none', immediateRender: false, scrollTrigger: { trigger: s, start: 'top 85%', end: 'top 25%', scrub: true } });
+  });
+
+  if (reduced) {
+    gsap.set($('[data-up]'), { opacity: 1 });
+  } else {
+    // giant caps rise line by line out of their masks
+    $('[data-lines]').forEach((h) => gsap.from(h.querySelectorAll('.ln > span'), { yPercent: 110, duration: 1.3, ease: 'expo.out', stagger: 0.08, scrollTrigger: { trigger: h, start: 'top 85%', once: true } }));
+    ScrollTrigger.batch($('[data-up]'), { start: 'top 90%', once: true, onEnter: (b) => gsap.fromTo(b, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.1, ease: 'power3.out', stagger: 0.1 }) });
+    // depth: collage + quiz tiles drift at their own speed
+    $('[data-speed]').forEach((el) => {
+      const sp = Number(el.dataset.speed);
+      gsap.fromTo(el, { y: 160 * sp }, { y: -220 * sp, ease: 'none', scrollTrigger: { trigger: el.closest('section'), start: 'top bottom', end: 'bottom top', scrub: true } });
+    });
+    // full-bleed photos breathe out
+    $('[data-zoom]').forEach((im) => gsap.fromTo(im, { scale: 1.2 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: im.closest('section'), start: 'top bottom', end: 'bottom top', scrub: true } }));
+  }
+  // finale: the photo pins, the title drifts off, the glass footer rides up over the frozen picture
+  const place = root.querySelector<HTMLElement>('[data-place]');
+  if (place) {
+    const stage = place.querySelector<HTMLElement>('[data-place-stage]')!, foot = place.querySelector<HTMLElement>('[data-place-foot]')!;
+    ScrollTrigger.create({ trigger: stage, start: 'top top', endTrigger: place, end: 'bottom bottom', pin: true, pinSpacing: false });
+    if (!reduced) {
+      gsap.fromTo(place.querySelector('[data-place-img]'), { scale: 1.18 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: place, start: 'top bottom', end: 'bottom bottom', scrub: true } });
+      gsap.to(place.querySelector('[data-place-title]'), { yPercent: -40, opacity: 0, ease: 'none', scrollTrigger: { trigger: foot, start: 'top bottom', end: 'top 45%', scrub: true } });
+      gsap.fromTo(foot, { y: 140, scale: 0.94, opacity: 0.2 }, { y: 0, scale: 1, opacity: 1, ease: 'power2.out', scrollTrigger: { trigger: foot, start: 'top bottom', end: 'bottom bottom', scrub: 0.6 } });
+    }
+  }
+  // curved carousel: each card turns towards the centre (concave wall) and grows a little towards the edges
+  const curve = root.querySelector<HTMLElement>('[data-curve]');
+  if (curve && !reduced) {
+    const cards = Array.from(curve.querySelectorAll<HTMLElement>('figure'));
+    let on = false;
+    const tick = () => {
+      if (!on) return;
+      const half = innerWidth / 2, maxDeg = innerWidth < 900 ? 16 : 24;
+      for (const c of cards) {
+        const r = c.getBoundingClientRect();
+        if (r.right < -200 || r.left > innerWidth + 200) continue;
+        const t = Math.max(-1.3, Math.min(1.3, (r.left + r.width / 2 - half) / half));
+        c.style.transform = `perspective(1100px) rotateY(${(-t * maxDeg).toFixed(2)}deg) scale(${(1 + 0.1 * t * t).toFixed(3)})`;
+      }
+      requestAnimationFrame(tick);
+    };
+    new IntersectionObserver(([e]) => { const was = on; on = e.isIntersecting; if (on && !was) requestAnimationFrame(tick); }).observe(curve);
+  }
+  // pins were created out of page order — sort so every start accounts for the spacers above it
+  ScrollTrigger.sort();
+  ScrollTrigger.refresh();
+  window.addEventListener('load', () => { ScrollTrigger.sort(); ScrollTrigger.refresh(); });
+  // theme flag for text colour (header etc. can read it later)
+  secs.forEach((s) => ScrollTrigger.create({ trigger: s, start: 'top 50%', end: 'bottom 50%', onToggle: (st) => { if (st.isActive) root.dataset.theme = s.dataset.theme; } }));
+</script>

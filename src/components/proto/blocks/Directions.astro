@@ -1,0 +1,56 @@
+---
+/** «Чотири напрямки одного сервісу» — editorial list of the four directions (moved from home). */
+const m = '/media/';
+const img = (n: string, sm = false) => `${m}${n}${sm ? '-sm' : ''}.webp`;
+const floors = [
+  ['00', 'Ручна мийка', 'level-car-wash-v2', '/levels/car-wash/', 'Шість постів ручної мийки преміум-класу. Піна, мікрофібра й жодних автоматичних щіток — кожне авто миють руками від першого до останнього кроку.'],
+  ['−01', 'Детейлінг-студія', 'level-detailing-studio-v2', '/levels/detailing-studio/', 'Підземний поверх для PPF, кераміки, тонування й тюнінгу. Чиста зона з контрольованим світлом, куди авто опускається ліфтом.'],
+  ['+01', 'Лаунж і шоурум', 'level-lounge-showroom-v2-s1', '/levels/lounge-showroom/', 'Поки авто в роботі — кава, тиша й панорама на пагорби. Тут же консультація з детейлінгу та плівок.'],
+  ['SW', 'Самомийка', 'level-car-wash-v2-s3', '/levels/self-wash/', 'Професійні засоби й обладнання — керуєте ви. Без запису, оплата карткою на посту, чотири програми.'],
+];
+const arrow = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+---
+
+  <!-- ============================================================ 4 · three levels, editorial list (dark → light) -->
+  <section class="dl-sec dl-culture" id="services" data-bg="#f6e4d6" data-theme="light">
+    <div class="dl-culture__l">
+      <h2 class="dl-serif" data-up>Чотири напрямки<br />одного сервісу</h2>
+      <p class="dl-body" data-up>Будівля працює як маршрут: авто заїжджає на мийку, за потреби опускається в студію, а ви піднімаєтеся в лаунж. Кожен поверх має свою команду, своє світло і свій стандарт якості — і один вхід для вас.</p>
+    </div>
+    <div class="dl-culture__r">
+      {floors.map(([code, name, src, href, text]) => (
+        <article class="dl-entry" data-up>
+          <div class="dl-entry__t">
+            <p class="dl-code">{code}</p>
+            <h3 class="dl-serif dl-serif--s">{name}</h3>
+            <div class="dl-cta"><a class="dl-pill dl-pill--light" href={href}>Детальніше</a><a class="dl-round" href={href} aria-label={name} set:html={arrow} /></div>
+          </div>
+          <figure><img src={img(src, true)} alt="" loading="lazy" /></figure>
+          <p class="dl-body dl-entry__d">{text}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+<style>
+  /* ---------------------------------------------------------- 4 culture */
+  .dl-culture { display: grid; grid-template-columns: 1fr 1.25fr; gap: clamp(40px, 6vw, 110px); }
+  .dl-culture__l { display: flex; flex-direction: column; justify-content: space-between; gap: 40px; position: sticky; top: 120px; align-self: start; min-height: 70vh; }
+  .dl-culture__l .dl-body { max-width: 42ch; }
+  .dl-culture__r { display: grid; }
+  .dl-entry { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 28px; padding: 36px 0 52px; border-left: 1px solid rgb(36 28 23 / 0.16); padding-left: 32px; }
+  .dl-entry__t { display: grid; align-content: start; gap: 18px; }
+  .dl-entry figure { margin: 0; aspect-ratio: 4 / 3; border-radius: 8px; overflow: hidden; }
+  .dl-entry img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease-out); }
+  .dl-entry:hover img { transform: scale(1.05); }
+  .dl-entry__d { grid-column: 2; font-size: 15px; }
+
+  .dl-code { margin: 0 0 6px; font: 600 13px var(--font-sans); color: var(--accent); }
+
+  @media (max-width: 900px) {
+    .dl-culture, .dl-journal { grid-template-columns: 1fr; }
+    .dl-culture__l { position: static; min-height: 0; }
+    .dl-entry { grid-template-columns: 1fr; padding-left: 18px; }
+    .dl-entry__d { grid-column: 1; }
+  }
+</style>

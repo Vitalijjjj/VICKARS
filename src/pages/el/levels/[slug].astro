@@ -1,0 +1,11 @@
+---
+import LevelPage from '@/components/levels/LevelPage.astro';
+import { levels } from '@/config/building';
+
+export function getStaticPaths() {
+  return levels.map((l) => ({ params: { slug: l.slug }, props: { id: l.id } }));
+}
+const { id } = Astro.props;
+---
+
+<LevelPage locale="el" id={id} />

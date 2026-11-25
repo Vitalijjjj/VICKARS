@@ -1,0 +1,452 @@
+[
+ {
+  "page": "home",
+  "device": "desktop",
+  "key": "01-hero",
+  "name": "Герой — кінець інтро",
+  "file": "home-desktop-01-hero.jpg",
+  "w": 1440,
+  "h": 900
+ },
+ {
+  "page": "home",
+  "device": "desktop",
+  "key": "02-building",
+  "name": "Будівля — наближення",
+  "file": "home-desktop-02-building.jpg",
+  "w": 1440,
+  "h": 900
+ },
+ {
+  "page": "home",
+  "device": "desktop",
+  "key": "03-building-end",
+  "name": "Будівля — рівні",
+  "file": "home-desktop-03-building-end.jpg",
+  "w": 1440,
+  "h": 900
+ },
+ {
+  "page": "home",
+  "device": "desktop",
+  "key": "04-v2-about",
+  "name": "Про нас",
+  "file": "home-desktop-04-v2-about.jpg",
+  "w": 1440,
+  "h": 1586
+ },
+ {
+  "page": "home",
+  "device": "desktop",
+  "key": "05-v2-bleed",
+  "name": "Ручна мийка — банер",
+  "file": "home-desktop-05-v2-bleed.jpg",
+  "w": 1440,
+  "h": 900
+ },
+ {
+  "page": "home",
+  "device": "desktop",
+  "key": "06-services",
+  "name": "Послуги — три рівні",
+  "file": "home-desktop-06-services.jpg",
+  "w": 1440,
+  "h": 1086
+ },
+ {
+  "page": "home",
+  "device": "desktop",
+  "key": "07-v2-feature",
+  "name": "Детейлінг-студія",
+  "file": "home-desktop-07-v2-feature.jpg",
+  "w": 1440,
+  "h": 1756
+ },
+ {
+  "page": "home",
+  "device": "desktop",
+  "key": "08-v2-bleed",
+  "name": "Лаунж — цитата",
+  "file": "home-desktop-08-v2-bleed.jpg",
+  "w": 1440,
+  "h": 900
+ },
+ {
+  "page": "home",
+  "device": "desktop",
+  "key": "09-process",
+  "name": "Як проходить візит",
+  "file": "home-desktop-09-process.jpg",
+  "w": 1440,
+  "h": 1463
+ },
+ {
+  "page": "home",
+  "device": "desktop",
+  "key": "10-benefits",
+  "name": "Чому VIK Cars",
+  "file": "home-desktop-10-benefits.jpg",
+  "w": 1440,
+  "h": 900
+ },
+ {
+  "page": "home",
+  "device": "desktop",
+  "key": "11-pricing",
+  "name": "Ціни + запис",
+  "file": "home-desktop-11-pricing.jpg",
+  "w": 1440,
+  "h": 1188
+ },
+ {
+  "page": "home",
+  "device": "desktop",
+  "key": "12-contacts",
+  "name": "Контакти",
+  "file": "home-desktop-12-contacts.jpg",
+  "w": 1440,
+  "h": 900
+ },
+ {
+  "page": "home",
+  "device": "desktop",
+  "key": "13-ft",
+  "name": "Футер",
+  "file": "home-desktop-13-ft.jpg",
+  "w": 1440,
+  "h": 647
+ },
+ {
+  "page": "car-wash",
+  "device": "desktop",
+  "key": "01-hero",
+  "name": "Герой — слайдер",
+  "file": "car-wash-desktop-01-hero.jpg",
+  "w": 1440,
+  "h": 900
+ },
+ {
+  "page": "car-wash",
+  "device": "desktop",
+  "key": "02-lvl__intro",
+  "name": "Вступ + факти",
+  "file": "car-wash-desktop-02-lvl__intro.jpg",
+  "w": 1440,
+  "h": 462
+ },
+ {
+  "page": "car-wash",
+  "device": "desktop",
+  "key": "03-lvl__cta",
+  "name": "Інші рівні + CTA",
+  "file": "car-wash-desktop-03-lvl__cta.jpg",
+  "w": 1440,
+  "h": 428
+ },
+ {
+  "page": "car-wash",
+  "device": "desktop",
+  "key": "04-ft",
+  "name": "Футер",
+  "file": "car-wash-desktop-04-ft.jpg",
+  "w": 1440,
+  "h": 647
+ },
+ {
+  "page": "detailing-studio",
+  "device": "desktop",
+  "key": "01-hero",
+  "name": "Герой — слайдер",
+  "file": "detailing-studio-desktop-01-hero.jpg",
+  "w": 1440,
+  "h": 900
+ },
+ {
+  "page": "detailing-studio",
+  "device": "desktop",
+  "key": "02-lvl__intro",
+  "name": "Вступ + факти",
+  "file": "detailing-studio-desktop-02-lvl__intro.jpg",
+  "w": 1440,
+  "h": 462
+ },
+ {
+  "page": "detailing-studio",
+  "device": "desktop",
+  "key": "03-lvl__cta",
+  "name": "Інші рівні + CTA",
+  "file": "detailing-studio-desktop-03-lvl__cta.jpg",
+  "w": 1440,
+  "h": 428
+ },
+ {
+  "page": "detailing-studio",
+  "device": "desktop",
+  "key": "04-ft",
+  "name": "Футер",
+  "file": "detailing-studio-desktop-04-ft.jpg",
+  "w": 1440,
+  "h": 647
+ },
+ {
+  "page": "lounge-showroom",
+  "device": "desktop",
+  "key": "01-hero",
+  "name": "Герой — слайдер",
+  "file": "lounge-showroom-desktop-01-hero.jpg",
+  "w": 1440,
+  "h": 900
+ },
+ {
+  "page": "lounge-showroom",
+  "device": "desktop",
+  "key": "02-lvl__intro",
+  "name": "Вступ + факти",
+  "file": "lounge-showroom-desktop-02-lvl__intro.jpg",
+  "w": 1440,
+  "h": 462
+ },
+ {
+  "page": "lounge-showroom",
+  "device": "desktop",
+  "key": "03-lvl__cta",
+  "name": "Інші рівні + CTA",
+  "file": "lounge-showroom-desktop-03-lvl__cta.jpg",
+  "w": 1440,
+  "h": 428
+ },
+ {
+  "page": "lounge-showroom",
+  "device": "desktop",
+  "key": "04-ft",
+  "name": "Футер",
+  "file": "lounge-showroom-desktop-04-ft.jpg",
+  "w": 1440,
+  "h": 647
+ },
+ {
+  "page": "home",
+  "device": "mobile",
+  "key": "01-hero",
+  "name": "Герой — кінець інтро",
+  "file": "home-mobile-01-hero.jpg",
+  "w": 375,
+  "h": 812
+ },
+ {
+  "page": "home",
+  "device": "mobile",
+  "key": "02-building",
+  "name": "Будівля — наближення",
+  "file": "home-mobile-02-building.jpg",
+  "w": 375,
+  "h": 812
+ },
+ {
+  "page": "home",
+  "device": "mobile",
+  "key": "03-building-end",
+  "name": "Будівля — рівні",
+  "file": "home-mobile-03-building-end.jpg",
+  "w": 375,
+  "h": 812
+ },
+ {
+  "page": "home",
+  "device": "mobile",
+  "key": "04-v2-about",
+  "name": "Про нас",
+  "file": "home-mobile-04-v2-about.jpg",
+  "w": 375,
+  "h": 965
+ },
+ {
+  "page": "home",
+  "device": "mobile",
+  "key": "05-v2-bleed",
+  "name": "Ручна мийка — банер",
+  "file": "home-mobile-05-v2-bleed.jpg",
+  "w": 375,
+  "h": 812
+ },
+ {
+  "page": "home",
+  "device": "mobile",
+  "key": "06-services",
+  "name": "Послуги — три рівні",
+  "file": "home-mobile-06-services.jpg",
+  "w": 375,
+  "h": 1819
+ },
+ {
+  "page": "home",
+  "device": "mobile",
+  "key": "07-v2-feature",
+  "name": "Детейлінг-студія",
+  "file": "home-mobile-07-v2-feature.jpg",
+  "w": 375,
+  "h": 1208
+ },
+ {
+  "page": "home",
+  "device": "mobile",
+  "key": "08-v2-bleed",
+  "name": "Лаунж — цитата",
+  "file": "home-mobile-08-v2-bleed.jpg",
+  "w": 375,
+  "h": 812
+ },
+ {
+  "page": "home",
+  "device": "mobile",
+  "key": "09-process",
+  "name": "Як проходить візит",
+  "file": "home-mobile-09-process.jpg",
+  "w": 375,
+  "h": 1928
+ },
+ {
+  "page": "home",
+  "device": "mobile",
+  "key": "10-benefits",
+  "name": "Чому VIK Cars",
+  "file": "home-mobile-10-benefits.jpg",
+  "w": 375,
+  "h": 812
+ },
+ {
+  "page": "home",
+  "device": "mobile",
+  "key": "11-pricing",
+  "name": "Ціни + запис",
+  "file": "home-mobile-11-pricing.jpg",
+  "w": 375,
+  "h": 1211
+ },
+ {
+  "page": "home",
+  "device": "mobile",
+  "key": "12-contacts",
+  "name": "Контакти",
+  "file": "home-mobile-12-contacts.jpg",
+  "w": 375,
+  "h": 812
+ },
+ {
+  "page": "home",
+  "device": "mobile",
+  "key": "13-ft",
+  "name": "Футер",
+  "file": "home-mobile-13-ft.jpg",
+  "w": 375,
+  "h": 688
+ },
+ {
+  "page": "car-wash",
+  "device": "mobile",
+  "key": "01-hero",
+  "name": "Герой — слайдер",
+  "file": "car-wash-mobile-01-hero.jpg",
+  "w": 375,
+  "h": 812
+ },
+ {
+  "page": "car-wash",
+  "device": "mobile",
+  "key": "02-lvl__intro",
+  "name": "Вступ + факти",
+  "file": "car-wash-mobile-02-lvl__intro.jpg",
+  "w": 375,
+  "h": 546
+ },
+ {
+  "page": "car-wash",
+  "device": "mobile",
+  "key": "03-lvl__cta",
+  "name": "Інші рівні + CTA",
+  "file": "car-wash-mobile-03-lvl__cta.jpg",
+  "w": 375,
+  "h": 276
+ },
+ {
+  "page": "car-wash",
+  "device": "mobile",
+  "key": "04-ft",
+  "name": "Футер",
+  "file": "car-wash-mobile-04-ft.jpg",
+  "w": 375,
+  "h": 688
+ },
+ {
+  "page": "detailing-studio",
+  "device": "mobile",
+  "key": "01-hero",
+  "name": "Герой — слайдер",
+  "file": "detailing-studio-mobile-01-hero.jpg",
+  "w": 375,
+  "h": 812
+ },
+ {
+  "page": "detailing-studio",
+  "device": "mobile",
+  "key": "02-lvl__intro",
+  "name": "Вступ + факти",
+  "file": "detailing-studio-mobile-02-lvl__intro.jpg",
+  "w": 375,
+  "h": 516
+ },
+ {
+  "page": "detailing-studio",
+  "device": "mobile",
+  "key": "03-lvl__cta",
+  "name": "Інші рівні + CTA",
+  "file": "detailing-studio-mobile-03-lvl__cta.jpg",
+  "w": 375,
+  "h": 276
+ },
+ {
+  "page": "detailing-studio",
+  "device": "mobile",
+  "key": "04-ft",
+  "name": "Футер",
+  "file": "detailing-studio-mobile-04-ft.jpg",
+  "w": 375,
+  "h": 688
+ },
+ {
+  "page": "lounge-showroom",
+  "device": "mobile",
+  "key": "01-hero",
+  "name": "Герой — слайдер",
+  "file": "lounge-showroom-mobile-01-hero.jpg",
+  "w": 375,
+  "h": 812
+ },
+ {
+  "page": "lounge-showroom",
+  "device": "mobile",
+  "key": "02-lvl__intro",
+  "name": "Вступ + факти",
+  "file": "lounge-showroom-mobile-02-lvl__intro.jpg",
+  "w": 375,
+  "h": 516
+ },
+ {
+  "page": "lounge-showroom",
+  "device": "mobile",
+  "key": "03-lvl__cta",
+  "name": "Інші рівні + CTA",
+  "file": "lounge-showroom-mobile-03-lvl__cta.jpg",
+  "w": 375,
+  "h": 276
+ },
+ {
+  "page": "lounge-showroom",
+  "device": "mobile",
+  "key": "04-ft",
+  "name": "Футер",
+  "file": "lounge-showroom-mobile-04-ft.jpg",
+  "w": 375,
+  "h": 688
+ }
+]

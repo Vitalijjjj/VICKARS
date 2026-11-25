@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>VIK Cars — Design board</title>
+<link rel="icon" href="assets/vikcars-badge.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300..800;1,300..800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<!--
+  Figma-style local board for the VIK Cars site. Not part of the site build.
+  Shots: node design/capture.mjs (dev server on :4321 + headless Chrome on :9333). Live frames load http://localhost:4321.
+  Pan: scroll / space+drag / H. Zoom: ⌘/Ctrl + scroll, pinch, + − 0. Fit: Shift+1 (all), Shift+2 (selection). Pages: 1–5 via the left panel.
+-->
+<style>
+  :root {
+    --ui: #ffffff; --ui-2: #f5f5f5; --ui-line: #e6e6e6; --ui-ink: #1e1e1e; --ui-ink-2: #757575; --ui-ink-3: #b3b3b3;
+    --canvas: #e5e5e5; --sel: #0d99ff; --sel-soft: rgb(13 153 255 / 0.1); --bar: #2c2c2c;
+    --site-accent: #e52532;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--canvas); color: var(--ui-ink); font: 11px/1.4 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  a { color: inherit; }
+
+  /* ---------------------------------------------------------------- top bar */
+  .bar { position: fixed; inset: 0 0 auto; height: 44px; display: flex; align-items: center; gap: 4px; padding: 0 8px; background: var(--bar); color: #fff; z-index: 20; }
+  .bar__logo { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 6px; }
+  .bar__logo img { width: 20px; }
+  .bar__tools { display: flex; gap: 2px; margin-left: 4px; }
+  .tool { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 6px; color: #fff; opacity: 0.85; }
+  .tool:hover { background: #ffffff1a; }
+  .tool.is-on { background: var(--sel); opacity: 1; }
+  .tool svg { width: 16px; height: 16px; }
+  .bar__title { position: absolute; left: 50%; translate: -50%; font-size: 12px; font-weight: 500; white-space: nowrap; }
+  .bar__title span { color: #ffffffa0; font-weight: 400; }
+  .bar__right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+  .seg { display: flex; background: #ffffff14; border-radius: 6px; padding: 2px; }
+  .seg button { padding: 5px 9px; border-radius: 4px; color: #ffffffb0; font-weight: 500; }
+  .seg button.is-on { background: #ffffff24; color: #fff; }
+  .zoom { min-width: 54px; padding: 7px 8px; border-radius: 6px; color: #fff; font-weight: 500; text-align: right; }
+  .zoom:hover { background: #ffffff1a; }
+  .present { display: flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 6px; background: var(--sel); color: #fff; font-weight: 600; text-decoration: none; }
+
+  /* ---------------------------------------------------------------- panels */
+  .panel { position: fixed; top: 44px; bottom: 0; width: 240px; background: var(--ui); z-index: 10; display: flex; flex-direction: column; }
+  .panel--l { left: 0; border-right: 1px solid var(--ui-line); }
+  .panel--r { right: 0; border-left: 1px solid var(--ui-line); }
+  .panel h3 { margin: 0; padding: 14px 16px 8px; font-size: 11px; font-weight: 600; }
+  .pages { padding-bottom: 8px; border-bottom: 1px solid var(--ui-line); }
+  .pages button, .layers button { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 16px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pages button:hover, .layers button:hover { background: var(--ui-2); }
+  .pages button.is-on { font-weight: 600; }
+  .pages button.is-on::before { content: '✓'; margin-left: -12px; width: 4px; font-size: 10px; }
+  .layers { flex: 1; overflow: auto; padding-bottom: 16px; }
+  .layers button { padding-left: 16px; color: var(--ui-ink); }
+  .layers button.is-on { background: var(--sel-soft); }
+  .layers .ico { width: 12px; flex: none; color: var(--ui-ink-2); font-size: 11px; text-align: center; }
+  .layers .grp { padding: 10px 16px 4px; color: var(--ui-ink-2); font-weight: 500; }
+  .props { padding: 0 16px 16px; display: grid; gap: 10px; }
+  .props .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .props .fld { display: flex; gap: 8px; padding: 6px 8px; background: var(--ui-2); border-radius: 5px; }
+  .props .fld i { font-style: normal; color: var(--ui-ink-2); }
+  .props .nm { font-size: 12px; font-weight: 600; }
+  .props .note { color: var(--ui-ink-2); line-height: 1.5; }
+  .props a.btn { display: block; padding: 8px; text-align: center; border: 1px solid var(--ui-line); border-radius: 6px; text-decoration: none; font-weight: 500; }
+  .props a.btn:hover { background: var(--ui-2); }
+  .sw { display: flex; align-items: center; gap: 8px; }
+  .sw b { width: 16px; height: 16px; border-radius: 3px; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.1); }
+  .help { margin-top: auto; padding: 12px 16px; border-top: 1px solid var(--ui-line); color: var(--ui-ink-2); line-height: 1.7; }
+  .help kbd { font: 500 10px Inter; padding: 1px 5px; border: 1px solid var(--ui-line); border-radius: 3px; background: var(--ui-2); color: var(--ui-ink); }
+
+  /* ---------------------------------------------------------------- canvas */
+  .stage { position: fixed; inset: 44px 240px 0 240px; overflow: hidden; cursor: default; }
+  .stage.is-hand { cursor: grab; }
+  .stage.is-dragging { cursor: grabbing; }
+  .stage.is-hand iframe, .stage.is-dragging iframe { pointer-events: none; }
+  .world { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+  .frame { position: absolute; background: #fff; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
+  .frame > img, .frame > iframe { display: block; width: 100%; height: 100%; border: 0; }
+  .frame > img { object-fit: cover; object-position: top; }
+  .frame__label {
+    position: absolute; left: 0; bottom: 100%; padding-bottom: calc(6px * var(--iz)); max-width: 100%;
+    font-size: calc(12px * var(--iz)); line-height: 1.2; color: var(--ui-ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: default; user-select: none;
+  }
+  .frame__size { position: absolute; left: 50%; top: 100%; translate: -50%; margin-top: calc(8px * var(--iz)); padding: calc(2px * var(--iz)) calc(6px * var(--iz)); border-radius: calc(3px * var(--iz)); background: var(--sel); color: #fff; font-size: calc(11px * var(--iz)); white-space: nowrap; display: none; }
+  .world.is-far .frame__label { display: none; }
+  .frame.is-on { outline: calc(2px * var(--iz)) solid var(--sel); }
+  .frame.is-on .frame__label { color: var(--sel); }
+  .frame.is-on .frame__size { display: block; }
+  .frame:not(.is-on):hover { outline: calc(1.5px * var(--iz)) solid var(--sel); }
+  .frame .h { position: absolute; width: calc(8px * var(--iz)); height: calc(8px * var(--iz)); background: #fff; border: calc(1.5px * var(--iz)) solid var(--sel); display: none; z-index: 2; }
+  .frame.is-on .h { display: block; }
+  .h--tl { left: 0; top: 0; translate: -50% -50%; } .h--tr { right: 0; top: 0; translate: 50% -50%; }
+  .h--bl { left: 0; bottom: 0; translate: -50% 50%; } .h--br { right: 0; bottom: 0; translate: 50% 50%; }
+  .section-title { position: absolute; font: 600 calc(1px * var(--t, 40)) Inter, sans-serif; color: var(--ui-ink); white-space: nowrap; letter-spacing: -0.02em; }
+  .section-title small { display: block; font-weight: 400; font-size: 0.45em; color: var(--ui-ink-2); letter-spacing: 0; margin-top: 0.3em; }
+  .live-dot { display: inline-block; width: 0.6em; height: 0.6em; border-radius: 50%; background: #14ae5c; margin-right: 0.35em; vertical-align: 0.05em; }
+
+  /* ---------------------------------------------------------------- built frames (cover + design system), site styles */
+  .ds { font-family: 'Inter Tight', sans-serif; color: #1b1a17; letter-spacing: -0.01em; }
+  .ds .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #8a857b; }
+  .ds h2 { margin: 0 0 40px; font-size: 56px; font-weight: 500; letter-spacing: -0.05em; line-height: 1; }
+  .cover { height: 100%; padding: 80px; display: flex; flex-direction: column; background: #121211; color: #f3f1ec; }
+  .cover__badge { width: 132px; }
+  .cover h1 { margin: auto 0 0; font-size: 168px; line-height: 0.86; font-weight: 500; letter-spacing: -0.055em; text-transform: uppercase; }
+  .cover p { margin: 28px 0 0; font-size: 26px; color: #f3f1ecb0; max-width: 44ch; letter-spacing: -0.02em; }
+  .cover p em { color: #f3f1ec; }
+  .cover__meta { display: flex; gap: 48px; margin-top: 56px; padding-top: 24px; border-top: 1px solid #ffffff22; font-size: 15px; color: #f3f1ec99; }
+  .cover__meta b { display: block; color: #f3f1ec; font-weight: 500; margin-top: 4px; }
+  .ds-pad { padding: 72px; height: 100%; background: #fbf9f5; }
+  .swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .swatch div { height: 150px; border-radius: 12px; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.08); }
+  .swatch b { display: block; margin-top: 12px; font-size: 17px; font-weight: 500; }
+  .swatch span { font-size: 14px; color: #8a857b; font-family: ui-monospace, Menlo, monospace; }
+  .type-row { display: grid; grid-template-columns: 220px 1fr; gap: 32px; align-items: baseline; padding: 26px 0; border-top: 1px solid #dcd7cc; }
+  .type-row:last-child { border-bottom: 1px solid #dcd7cc; }
+  .type-row .meta { font-size: 14px; color: #8a857b; line-height: 1.5; }
+  .type-row .meta b { display: block; color: #1b1a17; font-weight: 600; font-size: 15px; }
+  .t-display { font-size: 126px; font-weight: 500; line-height: 0.86; letter-spacing: -0.055em; text-transform: uppercase; }
+  .t-h1 { font-size: 74px; font-weight: 500; line-height: 1; letter-spacing: -0.05em; }
+  .t-h2 { font-size: 58px; font-weight: 500; line-height: 1.04; letter-spacing: -0.05em; }
+  .t-h3 { font-size: 34px; font-weight: 500; line-height: 1.1; letter-spacing: -0.035em; }
+  .t-lead { font-size: 30px; line-height: 1.22; letter-spacing: -0.03em; }
+  .t-lead em { font-style: italic; }
+  .t-body { font-size: 18px; line-height: 1.5; color: #4d4b46; max-width: 52ch; }
+  .t-label { font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+  .comp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .comp { padding: 32px; border-radius: 16px; background: #fff; box-shadow: inset 0 0 0 1px #ebe6dc; display: grid; gap: 18px; align-content: start; }
+  .comp > .eyebrow { margin-bottom: 4px; }
+  .comp--dark { background: #121211; box-shadow: none; }
+  .btns { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .b { display: inline-flex; align-items: center; padding: 16px 26px; border-radius: 10px; font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+  .b--dark { background: #0f0f0f; color: #fff; } .b--accent { background: #e52532; color: #fff; }
+  .b--light { background: #fff; color: #0f0f0f; } .b--ghost { color: #fff; box-shadow: inset 0 0 0 1px #ffffff99; }
+  .b--under { padding: 0 0 2px; border-radius: 0; border-bottom: 1px solid currentColor; }
+  .b--pill { padding: 12px 18px; border-radius: 14px; text-transform: none; letter-spacing: -0.01em; font-size: 14px; font-weight: 500; }
+  .field { padding: 17px 18px; border-radius: 10px; background: #fff; box-shadow: inset 0 0 0 1px #dcd7cc; font-size: 16px; color: #8a857b; }
+  .price-row { display: grid; grid-template-columns: 1fr 1.2fr auto; gap: 24px; align-items: baseline; padding: 20px 0; border-top: 1px solid #dcd7cc; border-bottom: 1px solid #dcd7cc; }
+  .marker { display: inline-flex; align-items: center; gap: 10px; padding: 9px 14px 9px 10px; border-radius: 10px; background: rgb(255 255 255 / 0.72); box-shadow: 0 8px 24px rgb(0 0 0 / 0.12), inset 0 0 0 1px rgb(255 255 255 / 0.8); font-size: 14px; font-weight: 500; }
+  .marker i { width: 10px; height: 10px; border-radius: 50%; background: #e52532; box-shadow: 0 0 0 4px rgb(229 37 50 / 0.2); }
+  .marker code { font: 600 12px ui-monospace, Menlo, monospace; color: #8a857b; }
+  .glass-bg { padding: 40px; border-radius: 12px; background: url('shots/home-desktop-01-hero.jpg') center 40% / cover; display: flex; gap: 14px; flex-wrap: wrap; }
+  .tokens { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; font-size: 15px; }
+  .tokens div { padding: 18px; border-radius: 12px; background: #fff; box-shadow: inset 0 0 0 1px #ebe6dc; }
+  .tokens b { display: block; font-size: 22px; font-weight: 500; letter-spacing: -0.03em; margin-bottom: 4px; }
+  .tokens span { color: #8a857b; }
+  .r-demo { display: flex; gap: 16px; align-items: end; }
+  .r-demo div { width: 90px; height: 90px; background: #1b1a17; }
+  .r-demo span { display: block; margin-top: 8px; font-size: 13px; color: #8a857b; text-align: center; }
+
+  .toast { position: fixed; left: 50%; bottom: 24px; translate: -50%; padding: 10px 14px; border-radius: 8px; background: var(--bar); color: #fff; font-size: 12px; z-index: 30; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+  .toast.is-on { opacity: 1; }
+</style>
+</head>
+<body>
+  <header class="bar">
+    <span class="bar__logo"><img src="assets/vikcars-badge.svg" alt="" /></span>
+    <div class="bar__tools">
+      <button class="tool is-on" data-tool="move" title="Move (V)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 1.5l9.5 6-4.2.9 2.4 4.6-1.5.8-2.4-4.6L3.6 12z"/></svg></button>
+      <button class="tool" data-tool="hand" title="Hand (H / Space)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M5 8V3.5a1 1 0 012 0V7m0-4.5v-.2a1 1 0 012 0V7m0-4a1 1 0 012 0v4.5m0-2.5a1 1 0 012 0v4.6c0 2.6-1.9 4.4-4.4 4.4H8.4c-1.4 0-2.4-.6-3.2-1.7L3 8.6a1 1 0 011.6-1.2L5 8"/></svg></button>
+    </div>
+    <div class="bar__title">VIK Cars — Website <span>/ Design v3 · <i data-page-name></i></span></div>
+    <div class="bar__right">
+      <div class="seg" data-locale title="Мова живих фреймів"><button class="is-on" data-l="">UA</button><button data-l="/ru">RU</button><button data-l="/el">EL</button></div>
+      <button class="zoom" data-zoom-btn title="Shift+1 — показати все">100%</button>
+      <a class="present" href="http://localhost:4321/" target="_blank" data-present>▶ Відкрити сайт</a>
+    </div>
+  </header>
+
+  <aside class="panel panel--l">
+    <h3>Сторінки</h3>
+    <div class="pages" data-pages></div>
+    <h3>Шари</h3>
+    <div class="layers" data-layers></div>
+    <div class="help">
+      <kbd>Scroll</kbd> рух · <kbd>⌘</kbd>+<kbd>Scroll</kbd> зум<br />
+      <kbd>Space</kbd>/<kbd>H</kbd> рука · <kbd>Shift</kbd>+<kbd>1</kbd> усе · <kbd>Shift</kbd>+<kbd>2</kbd> виділене<br />
+      Подвійний клік — наблизити фрейм
+    </div>
+  </aside>
+
+  <aside class="panel panel--r"><h3>Дизайн</h3><div class="props" data-props></div></aside>
+
+  <main class="stage" data-stage><div class="world" data-world></div></main>
+  <div class="toast" data-toast></div>
+
+<script>
+(async () => {
+  const SITE = 'http://localhost:4321';
+  const $ = (s, r = document) => r.querySelector(s);
+  const stage = $('[data-stage]'), world = $('[data-world]');
+  let manifest = [];
+  try { manifest = await (await fetch('shots/manifest.json', { cache: 'no-store' })).json(); } catch (e) { toast('Немає знімків — запусти node design/capture.mjs'); }
+
+  const PAGE_URL = { home: '/', 'car-wash': '/levels/car-wash/', 'detailing-studio': '/levels/detailing-studio/', 'lounge-showroom': '/levels/lounge-showroom/' };
+  const PAGE_NAME = { home: 'Головна', 'car-wash': '00 · Ручна мийка', 'detailing-studio': '−01 · Детейлінг-студія', 'lounge-showroom': '+01 · Лаунж і шоурум' };
+  const DEV = { desktop: { w: 1440, h: 900, name: 'Desktop' }, mobile: { w: 375, h: 812, name: 'Mobile' } };
+  let locale = '';
+
+  // ------------------------------------------------------------- page builders → [{kind, name, group, x, y, w, h, ...}]
+  const shots = (page, device) => manifest.filter((m) => m.page === page && m.device === device);
+  const GAP = 140;
+  function columns(pages, title) {
+    // each page: desktop column + mobile column, rows aligned so the same section sits side by side
+    const items = []; let x0 = 0;
+    for (const page of pages) {
+      const d = shots(page, 'desktop'), m = shots(page, 'mobile');
+      items.push({ kind: 'title', x: x0, y: -460, text: PAGE_NAME[page], sub: `${d.length} секцій · desktop 1440 / mobile 375` });
+      let y = 0; const desk = [], mob = [];
+      for (let i = 0; i < Math.max(d.length, m.length); i++) {
+        const a = d[i], b = m[i];
+        if (a) desk.push({ kind: 'shot', group: `${PAGE_NAME[page]} / Desktop`, name: `${a.key.slice(0, 2)} ${a.name}`, x: x0, y, w: a.w, h: a.h, src: `shots/${a.file}`, page, device: 'desktop' });
+        if (b) mob.push({ kind: 'shot', group: `${PAGE_NAME[page]} / Mobile`, name: `${b.key.slice(0, 2)} ${b.name}`, x: x0 + 1440 + 200, y, w: b.w, h: b.h, src: `shots/${b.file}`, page, device: 'mobile' });
+        y += Math.max(a ? a.h : 0, b ? b.h : 0) + GAP;
+      }
+      items.push(...desk, ...mob); // layers list: all desktop frames, then all mobile
+      x0 += 1440 + 200 + 375 + 600;
+    }
+    return items;
+  }
+  function prototype() {
+    const items = []; let x = 0;
+    items.push({ kind: 'title', x: 0, y: -460, text: 'Живий прототип', sub: 'Фрейми — справжній сайт з localhost:4321. Скроль і клікай усередині; мова — перемикач угорі.', live: true });
+    for (const page of Object.keys(PAGE_URL)) {
+      items.push({ kind: 'live', group: `${PAGE_NAME[page]}`, name: `${PAGE_NAME[page]} — Desktop`, x, y: 0, w: 1440, h: 900, page, device: 'desktop' });
+      items.push({ kind: 'live', group: `${PAGE_NAME[page]}`, name: `${PAGE_NAME[page]} — Mobile`, x, y: 900 + 200, w: 375, h: 812, page, device: 'mobile' });
+      x += 1440 + 240;
+    }
+    return items;
+  }
+  function designSystem() {
+    return [
+      { kind: 'title', x: 0, y: -460, text: 'Дизайн-система', sub: 'Токени з src/styles/global.css і компоненти головної' },
+      { kind: 'html', group: 'Foundations', name: 'Colors', x: 0, y: 0, w: 1440, tpl: 'colors' },
+      { kind: 'html', group: 'Foundations', name: 'Typography — Inter Tight', x: 1640, y: 0, w: 1440, tpl: 'type' },
+      { kind: 'html', group: 'Components', name: 'Components', x: 3280, y: 0, w: 1440, tpl: 'components' },
+      { kind: 'html', group: 'Foundations', name: 'Spacing · radius · motion', x: 0, y: 1400, w: 1440, tpl: 'tokens' },
+    ];
+  }
+  const PAGES = [
+    { id: 'cover', name: 'Обкладинка', build: () => [{ kind: 'html', group: 'Cover', name: 'Cover', x: 0, y: 0, w: 1600, h: 960, tpl: 'cover' }] },
+    { id: 'home', name: 'Головна — секції', build: () => columns(['home']) },
+    { id: 'levels', name: 'Сторінки рівнів', build: () => columns(['car-wash', 'detailing-studio', 'lounge-showroom']) },
+    { id: 'proto', name: 'Живий прототип', build: prototype },
+    { id: 'ds', name: 'Дизайн-система', build: designSystem },
+  ];
+
+  // ------------------------------------------------------------- html templates (site styles, real text)
+  const TPL = {
+    cover: () => `<div class="ds cover"><img class="cover__badge" src="assets/vikcars-badge.svg" alt="" />
+      <h1>VIK Cars<br/>Website</h1>
+      <p>Преміум-мийка та детейлінг у Лімасолі. Сайт-будівля: <em>інтро-відео → інтерактивні рівні → лендинги поверхів</em>.</p>
+      <div class="cover__meta"><div>Стек<b>Astro · GSAP · TypeScript</b></div><div>Мови<b>UA · RU · EL</b></div><div>Сторінки<b>Головна + 3 рівні</b></div><div>Статус<b>Дизайн v3 — на перегляді</b></div></div></div>`,
+    colors: () => `<div class="ds ds-pad"><p class="eyebrow">Foundations</p><h2>Кольори</h2><div class="swatches">${[
+      ['Accent', '#E52532', 'бейдж, CTA, маркери'], ['Accent deep', '#C02229', 'hover, помилки'], ['Ink', '#1B1A17', 'основний текст'], ['Ink 2', '#4A4740', 'вторинний текст'],
+      ['Ink 3', '#8A857B', 'підписи, мета'], ['Paper', '#FAF2E9', 'фон героя / інтро'], ['Section', '#FBF9F5', 'фон секцій'], ['Paper deep', '#F1E8DC', 'підкладки'],
+      ['Concrete', '#CFC8BD', 'будівля, плейсхолдери'], ['Line', '#DCD7CC', 'роздільники'], ['Night', '#121211', '«Про нас»'], ['Footer', '#0D0D0D', 'футер'],
+    ].map(([n, h, u]) => `<div class="swatch"><div style="background:${h}"></div><b>${n}</b><span>${h} · ${u}</span></div>`).join('')}</div></div>`,
+    type: () => `<div class="ds ds-pad"><p class="eyebrow">Foundations</p><h2>Типографіка</h2>${[
+      ['Display', '126 / 0.86 · 500 · −5.5% · caps<br/>fit-to-width', '<div class="t-display">VIK Cars — дім</div>'],
+      ['H1 / секція', '74 / 1.0 · 500 · −5%', '<div class="t-h1">Три рівні. Один сервіс.</div>'],
+      ['H2 / цитата', '58 / 1.04 · 500 · −5%', '<div class="t-h2">“Кожне авто ми <span style="color:#e52532">фотографуємо</span>”</div>'],
+      ['H3 / рядок', '34 / 1.1 · 500 · −3.5%', '<div class="t-h3">Ручна мийка</div>'],
+      ['Lead', '30 / 1.22 · 400 + italic', '<div class="t-lead">Перший на Кіпрі комплекс, де <em>ручна мийка, детейлінг і відпочинок</em> живуть під одним дахом.</div>'],
+      ['Body', '18 / 1.5 · 400', '<div class="t-body">Шість постів ручної мийки преміум-класу. Огляд і фото авто при прийомі, перевірка майстром при видачі.</div>'],
+      ['Label', '13 · 600 · +6% · caps', '<div class="t-label">Записатися на огляд</div>'],
+    ].map(([n, m, s]) => `<div class="type-row"><div class="meta"><b>${n}</b>${m}</div>${s}</div>`).join('')}</div>`,
+    components: () => `<div class="ds ds-pad"><p class="eyebrow">Components</p><h2>Компоненти</h2><div class="comp-grid">
+      <div class="comp"><p class="eyebrow">Кнопки — світлий фон</p><div class="btns"><span class="b b--dark">Записатися</span><span class="b b--accent b--pill">Записатися</span><span class="b b--under">Записатися на огляд</span></div></div>
+      <div class="comp comp--dark"><p class="eyebrow">Кнопки — темний фон / фото</p><div class="btns"><span class="b b--light">Зателефонувати</span><span class="b b--ghost">Маршрут ↗</span><span class="b b--under" style="color:#f3f1ec">Записатися на огляд</span></div></div>
+      <div class="comp"><p class="eyebrow">Форма запису</p><div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px"><span class="field">Ім'я</span><span class="field">Телефон</span><span class="b b--dark">Надіслати</span></div></div>
+      <div class="comp"><p class="eyebrow">Рядок ціни</p><div class="price-row"><span class="t-h3" style="font-size:28px">Кераміка</span><span class="t-body" style="font-size:16px">Захисне покриття</span><span class="t-label" style="color:#8a857b">За запитом</span></div></div>
+      <div class="comp" style="grid-column:1/-1"><p class="eyebrow">Маркери рівнів (Liquid Glass) — герой</p><div class="glass-bg"><span class="marker"><i></i><code>+01</code>Лаунж і шоурум ›</span><span class="marker"><i></i><code>00</code>Ручна мийка ›</span><span class="marker"><i></i><code>−01</code>Детейлінг-студія ›</span></div></div>
+    </div></div>`,
+    tokens: () => `<div class="ds ds-pad"><p class="eyebrow">Foundations</p><h2>Відступи · радіуси · рух</h2>
+      <div class="tokens">
+        <div><b>Gutter</b><span>clamp(16px, 3.2vw, 48px)</span></div><div><b>Секція</b><span>clamp(80px, 10vw, 150px) по вертикалі</span></div><div><b>Контент</b><span>max 1280px · ціни/форма 1100px</span></div>
+        <div><b>Header</b><span>60px (54 mobile) · radius 14 · glass blur 18</span></div><div><b>ease-out</b><span>cubic-bezier(.22, 1, .36, 1)</span></div><div><b>Reveal</b><span>маски знизу · expo.out 1.25s · stagger .06–.09</span></div>
+      </div>
+      <div class="r-demo" style="margin-top:40px">${[['6', 'поля'], ['10', 'кнопки, маркери'], ['14', 'header, фото'], ['50%', 'точки']].map(([r, n]) => `<div><div style="border-radius:${r.includes('%') ? r : r + 'px'}"></div><span>${r} · ${n}</span></div>`).join('')}</div></div>`,
+  };
+
+  // ------------------------------------------------------------- view state
+  let view = { x: 0, y: 0, z: 0.2 };
+  let items = [], els = [], current = null, sel = null;
+  const apply = () => {
+    world.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.z})`;
+    world.style.setProperty('--iz', 1 / view.z);
+    world.classList.toggle('is-far', view.z < 0.12);
+    $('[data-zoom-btn]').textContent = `${Math.round(view.z * 100)}%`;
+  };
+  const bounds = (list) => {
+    const b = list.reduce((a, it) => ({ x0: Math.min(a.x0, it.x), y0: Math.min(a.y0, it.y), x1: Math.max(a.x1, it.x + it.w), y1: Math.max(a.y1, it.y + it.h) }), { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity });
+    return b;
+  };
+  function fit(list, pad = 60, max = 1) {
+    const r = stage.getBoundingClientRect(), b = bounds(list);
+    if (!isFinite(b.x0)) return;
+    const z = Math.min(max, (r.width - pad * 2) / (b.x1 - b.x0), (r.height - pad * 2) / (b.y1 - b.y0));
+    view = { z, x: (r.width - (b.x1 - b.x0) * z) / 2 - b.x0 * z, y: (r.height - (b.y1 - b.y0) * z) / 2 - b.y0 * z };
+    apply();
+  }
+  function zoomAt(cx, cy, z) {
+    z = Math.min(4, Math.max(0.02, z));
+    view.x = cx - (cx - view.x) * (z / view.z); view.y = cy - (cy - view.y) * (z / view.z); view.z = z; apply();
+  }
+
+  // ------------------------------------------------------------- render a page
+  function render(pageId) {
+    current = PAGES.find((p) => p.id === pageId) || PAGES[0];
+    try { localStorage.setItem('vik-board-page', current.id); } catch {}
+    $('[data-page-name]').textContent = current.name;
+    world.innerHTML = ''; els = []; sel = null;
+    items = current.build();
+    for (const it of items) {
+      if (it.kind === 'title') {
+        const t = document.createElement('div');
+        t.className = 'section-title'; t.style.left = `${it.x}px`; t.style.top = `${it.y}px`; t.style.setProperty('--t', 96);
+        t.innerHTML = `${it.live ? '<span class="live-dot"></span>' : ''}${it.text}<small>${it.sub || ''}</small>`;
+        world.append(t); continue;
+      }
+      const f = document.createElement('div');
+      f.className = 'frame'; Object.assign(f.style, { left: `${it.x}px`, top: `${it.y}px`, width: `${it.w}px` });
+      if (it.h) f.style.height = `${it.h}px`;
+      if (it.kind === 'shot') f.innerHTML = `<img src="${it.src}" alt="" loading="lazy" decoding="async" />`;
+      if (it.kind === 'live') f.innerHTML = `<iframe src="${SITE}${locale}${PAGE_URL[it.page]}" title="${it.name}" loading="lazy"></iframe>`;
+      if (it.kind === 'html') f.innerHTML = TPL[it.tpl]();
+      f.insertAdjacentHTML('beforeend', `<div class="frame__label">${it.device ? DEV[it.device].name + ' / ' : ''}${it.name}</div><div class="frame__size"></div><i class="h h--tl"></i><i class="h h--tr"></i><i class="h h--bl"></i><i class="h h--br"></i>`);
+      f.addEventListener('pointerdown', (e) => { if (!handMode()) { select(els.indexOf(f)); e.stopPropagation(); } });
+      f.addEventListener('dblclick', () => fit([items[els.indexOf(f)]], 40, 2));
+      world.append(f); els.push(f); it.el = f;
+    }
+    items = items.filter((it) => it.kind !== 'title' || true);
+    // html frames size themselves — read their height back
+    for (const it of items) if (it.el && !it.h) it.h = it.el.offsetHeight;
+    layers(); props(); pages();
+    // open long pages at the top (like Figma's "zoom to fit width"), short ones fully fitted
+    requestAnimationFrame(() => {
+      const all = items.map((i) => i.kind === 'title' ? { x: i.x, y: i.y, w: 800, h: 200 } : i), b = bounds(all), r = stage.getBoundingClientRect();
+      if ((b.y1 - b.y0) / (b.x1 - b.x0) > 1.4 * (r.height / r.width)) {
+        const z = Math.min(1, (r.width - 120) / (b.x1 - b.x0));
+        view = { z, x: (r.width - (b.x1 - b.x0) * z) / 2 - b.x0 * z, y: 48 - b.y0 * z }; apply();
+      } else fit(all);
+    });
+  }
+  const frames = () => items.filter((i) => i.el);
+  function select(i) {
+    sel = i < 0 ? null : frames()[i];
+    els.forEach((e, k) => e.classList.toggle('is-on', k === i));
+    if (sel) sel.el.querySelector('.frame__size').textContent = `${sel.w} × ${Math.round(sel.h)}`;
+    document.querySelectorAll('[data-layer]').forEach((b) => b.classList.toggle('is-on', +b.dataset.layer === i));
+    props();
+  }
+
+  // ------------------------------------------------------------- panels
+  function pages() {
+    $('[data-pages]').innerHTML = PAGES.map((p) => `<button data-page="${p.id}" class="${p.id === current.id ? 'is-on' : ''}">${p.name}</button>`).join('');
+    document.querySelectorAll('[data-page]').forEach((b) => b.onclick = () => render(b.dataset.page));
+  }
+  function layers() {
+    let last = '';
+    $('[data-layers]').innerHTML = frames().map((it, i) => {
+      const g = it.group !== last ? `<div class="grp">${it.group}</div>` : ''; last = it.group;
+      const ico = it.kind === 'live' ? '●' : it.kind === 'shot' ? '#' : '▢';
+      return `${g}<button data-layer="${i}"><span class="ico">${ico}</span>${it.name}</button>`;
+    }).join('');
+    document.querySelectorAll('[data-layer]').forEach((b) => b.onclick = () => { select(+b.dataset.layer); fit([frames()[+b.dataset.layer]], 60, 1); });
+  }
+  function props() {
+    const p = $('[data-props]');
+    if (!sel) {
+      p.innerHTML = `<p class="note">Клікни фрейм на полотні або в «Шарах».</p>
+        <div class="nm">${current.name}</div>
+        <p class="note">${{ cover: 'Обкладинка проєкту.', home: 'Головна сторінка по секціях: зліва desktop 1440, справа mobile 375 — ті самі блоки на одному рівні.', levels: 'Три лендинги поверхів, кожен desktop + mobile.', proto: 'Живий сайт у фреймах — можна скролити, клікати, перемикати мову. Потрібен запущений dev-сервер.', ds: 'Кольори, шрифт, компоненти й токени.' }[current.id]}</p>
+        <div class="sw"><b style="background:#e5e5e5"></b>Canvas</div>`;
+      return;
+    }
+    const url = sel.page ? `${SITE}${locale}${PAGE_URL[sel.page]}` : null;
+    p.innerHTML = `<div class="nm">${sel.name}</div>
+      <div class="row"><span class="fld"><i>X</i>${Math.round(sel.x)}</span><span class="fld"><i>Y</i>${Math.round(sel.y)}</span></div>
+      <div class="row"><span class="fld"><i>W</i>${sel.w}</span><span class="fld"><i>H</i>${Math.round(sel.h)}</span></div>
+      <p class="note">${sel.kind === 'live' ? 'Живий фрейм: справжня сторінка, інтерактивна.' : sel.kind === 'shot' ? 'Знімок секції з локального сайту (стан після анімацій).' : 'Фрейм, зібраний зі стилів сайту.'}</p>
+      ${url ? `<a class="btn" href="${url}" target="_blank">Відкрити сторінку ↗</a>` : ''}
+      ${sel.src ? `<a class="btn" href="${sel.src}" target="_blank">Знімок у повному розмірі ↗</a>` : ''}`;
+  }
+
+  // ------------------------------------------------------------- input: pan, zoom, hand tool, keys
+  let tool = 'move', space = false, drag = null;
+  const handMode = () => tool === 'hand' || space;
+  const setTool = (t) => { tool = t; document.querySelectorAll('[data-tool]').forEach((b) => b.classList.toggle('is-on', b.dataset.tool === t)); stage.classList.toggle('is-hand', handMode()); };
+  document.querySelectorAll('[data-tool]').forEach((b) => b.onclick = () => setTool(b.dataset.tool));
+  stage.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const r = stage.getBoundingClientRect();
+    if (e.ctrlKey || e.metaKey) zoomAt(e.clientX - r.left, e.clientY - r.top, view.z * Math.exp(-e.deltaY * (e.ctrlKey && !e.metaKey ? 0.01 : 0.002)));
+    else { view.x -= e.deltaX; view.y -= e.deltaY; apply(); }
+  }, { passive: false });
+  stage.addEventListener('pointerdown', (e) => {
+    if (e.button === 1 || handMode() || !e.target.closest('.frame')) {
+      if (!handMode() && e.button === 0 && !e.target.closest('.frame')) select(-1);
+      drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y };
+      stage.classList.add('is-dragging'); stage.setPointerCapture(e.pointerId);
+    }
+  });
+  stage.addEventListener('pointermove', (e) => { if (drag) { view.x = drag.vx + e.clientX - drag.x; view.y = drag.vy + e.clientY - drag.y; apply(); } });
+  const end = () => { drag = null; stage.classList.remove('is-dragging'); };
+  stage.addEventListener('pointerup', end); stage.addEventListener('pointercancel', end);
+  addEventListener('keydown', (e) => {
+    if (e.target.closest?.('input, textarea')) return;
+    const r = stage.getBoundingClientRect(), c = [r.width / 2, r.height / 2];
+    if (e.code === 'Space' && !space) { space = true; stage.classList.toggle('is-hand', true); e.preventDefault(); }
+    else if (e.shiftKey && e.code === 'Digit1') fit(frames());
+    else if (e.shiftKey && e.code === 'Digit2' && sel) fit([sel], 40, 2);
+    else if (e.code === 'Digit0' && !e.shiftKey) zoomAt(...c, 1);
+    else if (e.key === '=' || e.key === '+') zoomAt(...c, view.z * 1.25);
+    else if (e.key === '-') zoomAt(...c, view.z / 1.25);
+    else if (e.key === 'h' || e.key === 'H') setTool('hand');
+    else if (e.key === 'v' || e.key === 'V') setTool('move');
+    else if (e.key === 'Escape') select(-1);
+  });
+  addEventListener('keyup', (e) => { if (e.code === 'Space') { space = false; stage.classList.toggle('is-hand', handMode()); } });
+  // Safari pinch
+  let gz = 1; stage.addEventListener('gesturestart', (e) => { e.preventDefault(); gz = view.z; });
+  stage.addEventListener('gesturechange', (e) => { e.preventDefault(); const r = stage.getBoundingClientRect(); zoomAt(e.clientX - r.left, e.clientY - r.top, gz * e.scale); });
+  $('[data-zoom-btn]').onclick = () => fit(frames());
+
+  // locale for live frames
+  document.querySelectorAll('[data-locale] button').forEach((b) => b.onclick = () => {
+    locale = b.dataset.l; document.querySelectorAll('[data-locale] button').forEach((x) => x.classList.toggle('is-on', x === b));
+    $('[data-present]').href = `${SITE}${locale}/`;
+    frames().forEach((it) => { if (it.kind === 'live') it.el.querySelector('iframe').src = `${SITE}${locale}${PAGE_URL[it.page]}`; });
+    toast(current.id === 'proto' ? `Мова: ${b.textContent}` : `Мова ${b.textContent} — для «Живого прототипу»`);
+    props();
+  });
+
+  function toast(t) { const el = $('[data-toast]'); el.textContent = t; el.classList.add('is-on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('is-on'), 2200); }
+  let start = 'cover'; try { start = localStorage.getItem('vik-board-page') || 'cover'; } catch {}
+  render(start);
+})();
+</script>
+</body>
+</html>

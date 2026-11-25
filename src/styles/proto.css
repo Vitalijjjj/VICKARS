@@ -1,0 +1,62 @@
+/* PROTOTYPE primitives shared by the Delta-structure prototypes (src/components/proto/**, src/pages/prototype/**).
+   Same values as the scoped copies in DeltaSections.astro — global here so block components can use them. */
+.dl {
+  --dk: #1d1815; --cream: #f4e6d8; --cream-2: rgb(244 230 216 / 0.66); --peach: #f6e4d6; --ink: #241c17; --ink-2: #6a5b50;
+  --mint: #dff3e4; --glass: rgb(255 255 255 / 0.07); --glass-line: rgb(255 255 255 / 0.18);
+  position: relative; background: var(--paper); color: var(--ink); overflow: hidden; font-family: var(--font-sans);
+}
+.dl section[data-theme='dark'] { color: var(--cream); }
+.dl-sec { position: relative; padding: clamp(110px, 12vw, 190px) var(--gutter); }
+
+.dl-display {
+  margin: 0; font-size: clamp(3rem, 1rem + 7.4vw, 9.6rem); font-weight: 600; line-height: 0.9; letter-spacing: -0.055em;
+  text-transform: uppercase; text-align: center; color: var(--cream);
+}
+section[data-theme='light'] .dl-display { color: var(--ink); }
+.dl-display--m { font-size: clamp(2.6rem, 1rem + 5.6vw, 7.4rem); }
+.dl-display small { font-size: 0.32em; font-weight: 500; letter-spacing: -0.02em; vertical-align: 0.95em; margin: 0 0.12em; }
+.dl-display .ln { display: block; overflow: hidden; padding: 0.06em 0 0.04em; margin: -0.06em 0 -0.04em; }
+.dl-display .ln > span { display: inline-block; }
+.dl-serif { margin: 0; font-size: clamp(2.6rem, 1.4rem + 3.4vw, 5rem); font-weight: 300; line-height: 0.98; letter-spacing: -0.05em; color: var(--ink); }
+section[data-theme='dark'] .dl-serif { color: var(--cream); }
+.dl-serif--s { font-size: clamp(1.9rem, 1.2rem + 1.6vw, 2.9rem); }
+.dl-serif--l { font-size: clamp(2.4rem, 1.2rem + 3.6vw, 5.2rem); text-align: center; }
+.dl-lead { max-width: 34ch; margin: 0; font-size: clamp(16px, 14px + 0.4vw, 19px); line-height: 1.5; color: var(--cream-2); }
+.dl-lead--c { margin-inline: auto; text-align: center; }
+.dl-body { margin: 0; font-size: clamp(16px, 15px + 0.2vw, 18px); line-height: 1.5; color: var(--ink-2); }
+section[data-theme='dark'] .dl-body { color: var(--cream-2); }
+.dl-eyebrow { margin: 0 0 22px; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--cream-2); }
+section[data-theme='light'] .dl-eyebrow { color: var(--ink-2); }
+.dl-num { font-style: italic; font-weight: 200; letter-spacing: -0.03em; color: var(--accent); }
+
+.dl-cta { display: inline-flex; align-items: center; gap: 6px; }
+.dl-cta--c { display: flex; justify-content: center; }
+.dl-pill { display: inline-flex; align-items: center; height: 48px; padding: 0 24px; border-radius: 999px; background: var(--cream); color: var(--dk); font-size: 15px; font-weight: 500; letter-spacing: -0.01em; border: 0; cursor: pointer; transition: background 0.35s, color 0.35s; }
+.dl-pill:hover { background: #fff; }
+.dl-pill--light { background: #fff; }
+.dl-pill--dark { background: var(--dk); color: var(--cream); }
+.dl-pill--dark:hover { background: var(--accent); color: #fff; }
+.dl-pill--accent { background: var(--accent); color: #fff; }
+.dl-pill--accent:hover { background: var(--accent-deep); }
+.dl-pill--ghost { background: rgb(255 255 255 / 0.08); color: var(--cream); box-shadow: inset 0 0 0 1px var(--glass-line); backdrop-filter: blur(12px); }
+.dl-round { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: var(--dk); color: var(--cream); transition: transform 0.45s var(--ease-out), background 0.35s; }
+.dl-round svg { width: 20px; height: 20px; }
+.dl-round:hover { transform: rotate(-45deg); background: var(--accent); }
+section[data-theme='dark'] .dl-round:not(.dl-round--accent) { background: rgb(255 255 255 / 0.1); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.22); backdrop-filter: blur(12px); }
+.dl-round--accent { background: var(--accent); color: #fff; }
+
+/* glass card on dark */
+.dl-glass-card { border-radius: 20px; background: var(--glass); box-shadow: inset 0 0 0 1px var(--glass-line), inset 0 1px 0 rgb(255 255 255 / 0.12); backdrop-filter: blur(22px) saturate(1.2); -webkit-backdrop-filter: blur(22px) saturate(1.2); }
+
+/* fields */
+.dl-field { height: 52px; padding: 0 18px; border-radius: 999px; border: 0; font: inherit; font-size: 15px; color: var(--cream); background: rgb(255 255 255 / 0.08); box-shadow: inset 0 0 0 1px var(--glass-line); }
+.dl-field::placeholder { color: var(--cream-2); }
+.dl-field:focus { outline: none; box-shadow: inset 0 0 0 1.5px var(--cream); }
+.dl-field option { color: #111; }
+
+/* prototype review marker: which blocks are new */
+.pt-new { position: absolute; z-index: 30; top: 18px; right: 18px; display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 999px; font: 600 11px var(--font-sans); letter-spacing: 0.06em; text-transform: uppercase; color: #fff; background: #0d99ff; box-shadow: 0 6px 18px rgb(13 153 255 / 0.35); pointer-events: none; }
+.pt-new::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+.pt-draft { font-size: 12px; font-style: italic; font-weight: 300; opacity: 0.6; }
+
+html.js .dl [data-up] { opacity: 0; }

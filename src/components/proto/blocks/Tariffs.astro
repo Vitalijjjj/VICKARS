@@ -1,0 +1,296 @@
+---
+/** CTA форма + тарифи/пакети. Dark. Tabs per direction → a fanned deck of three glass «tickets»
+ *  (clear / red featured / smoked glass, perforation + notches). Entering the screen, the deck rises and deals:
+ *  the side tickets fly out into the fan with a spring, the featured one is pulled out last, a glint runs over
+ *  the glass. Click a ticket to pull it out; «Обрати» on the front ticket fills the booking form below.
+ *  Prices are null in config/business.ts → "після огляду". `only` pins one direction (direction pages). */
+interface Props { isNew?: boolean; only?: 'wash' | 'studio' | 'self' | 'lounge' }
+const { isNew = true, only } = Astro.props;
+// [name, time, included]
+type Pack = [string, string, string[]];
+const sets: Record<string, { name: string; packs: Pack[] }> = {
+  wash: { name: 'Ручна мийка', packs: [
+    ['Express', '≈ 40 хв', ['Двофазна мийка кузова', 'Диски й арки', 'Сушіння мікрофіброю']],
+    ['Premium', '≈ 90 хв', ['Все з Express', 'Салон: пилосос і пластик', 'Скло всередині й зовні', 'Швидкий віск']],
+    ['Signature', '≈ 3 год', ['Все з Premium', 'Глибока чистка салону', 'Очищення бітуму й металу', 'Захисний сілант']],
+  ] },
+  studio: { name: 'Детейлінг', packs: [
+    ['Кераміка', 'від 1 дня', ['Підготовка й полірування', 'Кераміка 1 шар', 'Гарантія 1 рік']],
+    ['PPF Front', 'від 2 днів', ['Капот, бампер, фари, дзеркала', 'Плівка з самовідновленням', 'Гарантія 5 років']],
+    ['PPF Full', 'від 4 днів', ['Повне оклеювання кузова', 'Матова або глянцева', 'Гарантія 10 років']],
+  ] },
+  lounge: { name: 'Лаунж', packs: [
+    ['Гість', 'під час обслуговування', ['Кава, чай і вода', 'Wi-Fi і зарядки', 'Фото процесу в месенджер']],
+    ['Робочий візит', 'до 3 год', ['Тиха робоча зона', 'Переговорна на 4 місця', 'Кава без обмежень']],
+    ['Презентація', 'за домовленістю', ['Авто в шоурумі', 'Світло й фотозона', 'Приватний вечір']],
+  ] },
+  self: { name: 'Самомийка', packs: [
+    ['Старт', '5 хв', ['Піна + вода', 'Оплата карткою на посту']],
+    ['Повний цикл', '10 хв', ['Піна, вода, віск, осмос', 'Висихає без розводів']],
+    ['Абонемент', '10 візитів', ['Знижка на хвилини', 'Пріоритет у вихідні']],
+  ] },
+};
+const keys = only ? [only] : ['wash', 'studio', 'self'];
+const tone = ['clear', 'hot', 'smoke'];
+const deal = [0, 2, 1];   // dealing order: left, right, then the featured one is pulled out last
+---
+
+<section class="tf dl-sec" data-bg="#1d1815" data-theme="dark" id="pricing" data-tf>
+  {isNew && <span class="pt-new">Новий блок · Тарифи + форма</span>}
+  <div class="tf__back" aria-hidden="true"><i class="tf__blob tf__blob--a"></i><i class="tf__blob tf__blob--b"></i></div>
+  <header class="tf__head">
+    <h2 class="dl-display dl-display--m" data-lines><span class="ln"><span>Витягніть <small>свій</small> квиток</span></span></h2>
+    {keys.length > 1 && (
+      <div class="tf__tabs" role="tablist" data-up>
+        {keys.map((k, i) => <button type="button" role="tab" class:list={{ 'is-on': i === 0 }} aria-selected={i === 0 ? 'true' : 'false'} data-tf-tab={k}>{sets[k].name}</button>)}
+      </div>
+    )}
+  </header>
+
+  {keys.map((k, i) => (
+    <div class="deck" data-tf-set={k} data-deck hidden={i !== 0}>
+      {sets[k].packs.map(([name, time, list], j) => (
+        <article class:list={['tk', `tk--${tone[j]}`, { 'is-on': j === 1 }]} style={`--i:${j - 1};--d:${deal[j]}`} data-tk tabindex="0" aria-label={`${name}, ${time}`}>
+          <div class="tk__top">
+            <span class="tk__no">0{j + 1}{j === 1 && <b class="tk__hot">Найчастіше</b>}</span>
+            <h3>{name}</h3>
+            <em>{time}</em>
+          </div>
+          <ul>{list.map((x) => <li>{x}</li>)}</ul>
+          <div class="tk__foot">
+            <p><small>Ціна</small>після огляду</p>
+            <a class="tk__btn" href="#booking" data-tf-pick={`${sets[k].name} · ${name}`} data-time={time} data-list={list.join('|')}>Обрати</a>
+          </div>
+        </article>
+      ))}
+    </div>
+  ))}
+  <p class="tf__hint" data-up>Натисніть на квиток, щоб витягнути його</p>
+
+  <p class="tf__or">або подзвоніть <a href="tel:+35799571407">+357 99 571407</a> · <span class="pt-draft">ціни підставимо, коли клієнт надішле</span></p>
+
+  <!-- booking pop-up: opens from «Обрати» (and any «Записатися» → #booking link on the page) -->
+  <dialog class="bk" id="booking" data-bk aria-labelledby="bk-title">
+    <div class="bk__card">
+      <button class="bk__x" type="button" data-bk-close aria-label="Закрити"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+      <div class="bk__tk" data-bk-ticket hidden>
+        <span class="bk__label">Ваш квиток</span>
+        <b data-bk-name></b>
+        <em data-bk-time></em>
+        <ul data-bk-list></ul>
+      </div>
+      <form class="bk__form" data-tf-form novalidate>
+        <h3 id="bk-title">Запис на огляд</h3>
+        <p class="bk__lead">Залиште номер — передзвонимо за 15 хвилин і підберемо зручний час.</p>
+        <input class="dl-field" name="name" placeholder="Ім'я" aria-label="Ім'я" autocomplete="name" />
+        <input class="dl-field" name="phone" type="tel" placeholder="+357 …" aria-label="Телефон" autocomplete="tel" required />
+        <input type="hidden" name="pack" data-tf-pack />
+        <button class="dl-pill dl-pill--accent bk__send" type="submit">Записатися</button>
+        <p class="bk__fine">або <a href="tel:+35799571407">+357 99 571407</a></p>
+      </form>
+      <div class="bk__done" data-tf-sent hidden>
+        <span class="bk__check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <h3>Дякуємо!</h3>
+        <p>Передзвонимо найближчим часом, щоб підтвердити час.</p>
+        <button class="dl-pill" type="button" data-bk-close>Готово</button>
+      </div>
+    </div>
+  </dialog>
+</section>
+
+<style>
+  .tf { position: relative; isolation: isolate; overflow: hidden; display: grid; gap: clamp(28px, 3.4vw, 48px); }
+  .tf__back { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+  .tf__blob { position: absolute; border-radius: 50%; filter: blur(90px); }
+  .tf__blob--a { width: 46vw; height: 46vw; left: 18%; top: 22%; background: radial-gradient(circle, rgb(229 37 50 / 0.55), transparent 65%); }
+  .tf__blob--b { width: 38vw; height: 38vw; right: 10%; top: 34%; background: radial-gradient(circle, rgb(244 230 216 / 0.26), transparent 65%); }
+  .tf__head { display: grid; justify-items: center; gap: 28px; }
+  .tf__head .dl-display small { font-size: 0.4em; font-weight: 300; font-style: italic; letter-spacing: -0.02em; vertical-align: 0.6em; text-transform: none; }
+  .tf__tabs { display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: rgb(255 255 255 / 0.06); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.14); }
+  .tf__tabs button { height: 42px; padding: 0 20px; border: 0; border-radius: 999px; font: 500 15px var(--font-sans); color: var(--cream-2); background: none; cursor: pointer; transition: background 0.3s, color 0.3s; }
+  .tf__tabs button.is-on { background: var(--cream); color: var(--dk); }
+
+  /* ---------- the deck */
+  .deck { --w: 360px; --dx: 250px; --rot: 9deg; --drop: 30px; position: relative; overflow: visible; width: 100%; max-width: 1100px; height: 440px; margin: 0 auto; clip-path: inset(-400px -100vw -30px -100vw); }
+  .deck[hidden] { display: none; }
+  .tk {
+    --n: 14px; --foot: 100px;
+    position: absolute; left: 50%; top: 24px; width: var(--w); display: grid; gap: 20px; padding: 28px; border-radius: 24px; color: #fff; cursor: pointer; outline: none; overflow: hidden;
+    background: linear-gradient(130deg, rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.05) 45%, rgb(255 255 255 / 0.12)), rgb(30 26 23 / 0.2);
+    backdrop-filter: blur(26px) saturate(1.6); -webkit-backdrop-filter: blur(26px) saturate(1.6);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), inset 0 0 0 1px rgb(255 255 255 / 0.18);
+    mask: radial-gradient(circle var(--n) at 0 calc(100% - var(--foot)), #0000 97%, #000), radial-gradient(circle var(--n) at 100% calc(100% - var(--foot)), #0000 97%, #000);
+    mask-composite: intersect;
+    /* pre-deal: below the deck area, each ticket tilted the other way, so it floats up into the fan */
+    transform: translateX(calc(-50% + var(--i) * var(--dx) * 0.55)) translateY(520px) rotate(calc(var(--i) * -6deg)) scale(0.9);
+    opacity: 0; z-index: 1;
+  }
+  .tk.is-on { z-index: 3; }
+  .tk--hot { background: linear-gradient(130deg, rgb(255 120 120 / 0.42), rgb(229 37 50 / 0.3) 45%, rgb(255 140 140 / 0.36)), rgb(120 10 20 / 0.25); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6), inset 0 0 0 1px rgb(255 180 180 / 0.4); }
+  .tk--smoke { background: linear-gradient(130deg, rgb(255 255 255 / 0.12), rgb(255 255 255 / 0.02) 45%, rgb(255 255 255 / 0.07)), rgb(8 7 6 / 0.55); }
+  /* glint that runs over the glass once a ticket lands */
+  .tk::after { content: ''; position: absolute; inset: -20% -60%; pointer-events: none; background: linear-gradient(105deg, transparent 42%, rgb(255 255 255 / 0.3) 50%, transparent 58%); transform: translateX(-70%); opacity: 0; }
+
+  /* dealt: the fan */
+  .deck.is-dealt .tk {
+    opacity: 1;
+    transform: translateX(calc(-50% + var(--i) * var(--dx))) translateY(calc(var(--i) * var(--i) * var(--drop))) rotate(calc(var(--i) * var(--rot))) scale(0.92);
+    transition: transform 1.6s cubic-bezier(0.16, 1.08, 0.3, 1) calc(var(--d) * 180ms + 150ms), opacity 0.9s cubic-bezier(0.33, 1, 0.68, 1) calc(var(--d) * 180ms + 150ms);
+  }
+  .deck.is-dealt .tk.is-on { transform: translateX(-50%) translateY(-14px) rotate(0deg) scale(1); }
+  .deck.is-dealt .tk::after { animation: tk-glint 1.2s ease calc(var(--d) * 180ms + 1300ms) 1 forwards; }
+  @keyframes tk-glint { 0% { opacity: 1; transform: translateX(-70%); } 100% { opacity: 1; transform: translateX(70%); } }
+  /* after the deal, picking a ticket reacts at once */
+  .deck.is-ready .tk { transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s; }
+  .deck.is-ready .tk:not(.is-on):hover { transform: translateX(calc(-50% + var(--i) * var(--dx))) translateY(calc(var(--i) * var(--i) * var(--drop) - 12px)) rotate(calc(var(--i) * var(--rot))) scale(0.93); }
+
+  .tk__top { display: grid; gap: 4px; }
+  .tk__no { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 300; font-style: italic; opacity: 0.85; }
+  .tk__hot { padding: 4px 10px; border-radius: 999px; font-size: 11px; font-style: normal; font-weight: 600; color: var(--accent); background: #fff; }
+  .tk h3 { margin: 0; font-size: 40px; font-weight: 600; letter-spacing: -0.05em; text-transform: uppercase; line-height: 1; }
+  .tk__top em { font-weight: 200; font-size: 17px; opacity: 0.8; }
+  .tk ul { margin: 0; padding: 0; list-style: none; display: grid; align-content: start; gap: 9px; font-size: 15px; color: rgb(255 255 255 / 0.9); }
+  .tk li::before { content: '✓'; margin-right: 12px; color: var(--accent); font-weight: 600; }
+  .tk--hot li::before { color: #fff; }
+  .tk__foot { position: relative; height: calc(var(--foot) - 28px); display: flex; justify-content: space-between; align-items: center; padding-top: 6px; }
+  .tk__foot::before { content: ''; position: absolute; top: 0; left: 0; right: 0; border-top: 1.5px dashed rgb(255 255 255 / 0.35); }
+  .tk__foot p { margin: 0; display: grid; font-size: 20px; font-weight: 300; }
+  .tk__foot small { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgb(255 255 255 / 0.65); }
+  .tk__btn { display: inline-flex; align-items: center; height: 46px; padding: 0 26px; border-radius: 999px; font-size: 15px; font-weight: 500; color: #fff; background: var(--accent); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35), 0 10px 24px rgb(229 37 50 / 0.35); transition: background 0.3s; }
+  .tk__btn:hover { background: var(--accent-deep); }
+  .tk--hot .tk__btn { color: var(--accent); background: #fff; }
+  .tk--hot .tk__btn:hover { background: var(--cream); }
+  .tf__hint { margin: -20px 0 -8px; text-align: center; font-size: 13px; font-style: italic; color: var(--cream-2); }
+
+  /* ---------- booking pop-up */
+  .bk { width: min(820px, calc(100% - 24px)); max-width: none; max-height: calc(100dvh - 24px); padding: 0; border: 0; background: none; color: #fff; overflow: visible; }
+  .bk::backdrop { background: rgb(12 10 9 / 0.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .bk[open] { animation: bk-in 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+  .bk[open]::backdrop { animation: bk-fade 0.4s ease; }
+  @keyframes bk-in { from { opacity: 0; transform: translateY(60px) scale(0.96); } }
+  @keyframes bk-fade { from { opacity: 0; } }
+  .bk__card {
+    position: relative; display: grid; grid-template-columns: 0.9fr 1.1fr; border-radius: 28px; overflow: hidden;
+    background: linear-gradient(130deg, rgb(255 255 255 / 0.16), rgb(255 255 255 / 0.04) 45%, rgb(255 255 255 / 0.1)), rgb(28 24 21 / 0.72);
+    backdrop-filter: blur(30px) saturate(1.5); -webkit-backdrop-filter: blur(30px) saturate(1.5);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5), inset 0 0 0 1px rgb(255 255 255 / 0.16), 0 40px 100px rgb(0 0 0 / 0.5);
+  }
+  .bk__card:has(.bk__tk[hidden]) { grid-template-columns: 1fr; }
+  .bk__x { position: absolute; z-index: 2; top: 14px; right: 14px; display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; cursor: pointer; color: #fff; background: rgb(255 255 255 / 0.1); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.18); }
+  .bk__x:hover { background: rgb(255 255 255 / 0.2); }
+  .bk__x svg { width: 18px; height: 18px; }
+  .bk__tk { position: relative; display: grid; align-content: start; gap: 6px; padding: 34px 30px; background: linear-gradient(150deg, rgb(255 120 120 / 0.38), rgb(229 37 50 / 0.28)); border-right: 1.5px dashed rgb(255 255 255 / 0.35); }
+  .bk__tk[hidden] { display: none; }
+  .bk__label { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgb(255 255 255 / 0.75); }
+  .bk__tk b { font-size: 38px; font-weight: 600; letter-spacing: -0.05em; text-transform: uppercase; line-height: 1.02; }
+  .bk__tk em { font-weight: 200; font-size: 17px; opacity: 0.85; margin-bottom: 14px; }
+  .bk__tk ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 14.5px; }
+  .bk__tk li::before { content: '✓'; margin-right: 10px; font-weight: 600; }
+  .bk__form, .bk__done { display: grid; align-content: center; gap: 12px; padding: 40px 34px 34px; }
+  .bk__form h3, .bk__done h3 { margin: 0; font-size: 30px; font-weight: 500; letter-spacing: -0.04em; }
+  .bk__lead { margin: 0 0 8px; font-size: 15px; line-height: 1.5; color: var(--cream-2); }
+  .bk__send { justify-content: center; margin-top: 4px; }
+  .bk__fine { margin: 2px 0 0; text-align: center; font-size: 13px; color: var(--cream-2); }
+  .bk__fine a { color: var(--cream); border-bottom: 1px solid currentColor; }
+  .bk__form[hidden] { display: none; }
+  .bk__done { justify-items: start; }
+  .bk__done[hidden] { display: none; }
+  .bk__done p { margin: 0 0 8px; color: var(--cream-2); }
+  .bk__check { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; color: #fff; background: var(--accent); box-shadow: 0 10px 30px rgb(229 37 50 / 0.45); }
+  .bk__check svg { width: 26px; height: 26px; }
+  .tf__or { margin: 0; text-align: center; font-size: 14px; color: var(--cream-2); }
+  .tf__or a { color: var(--cream); border-bottom: 1px solid currentColor; }
+
+  @media (max-width: 900px) {
+    .deck { --w: 290px; --dx: 46px; --rot: 7deg; --drop: 16px; height: 440px; }
+    .tk { padding: 24px; }
+    .tk h3 { font-size: 34px; }
+    .bk__card { grid-template-columns: 1fr; }
+    .bk__tk { border-right: 0; border-bottom: 1.5px dashed rgb(255 255 255 / 0.35); padding: 26px 24px; }
+    .bk__tk ul { display: none; }
+    .bk__tk b { font-size: 30px; }
+    .bk__form, .bk__done { padding: 26px 24px; }
+    .tf__tabs button { padding: 0 14px; font-size: 14px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .deck .tk, .deck.is-dealt .tk { transition: none !important; }
+    .tk::after { display: none; }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-tf]').forEach((tf) => {
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const timers = new WeakMap<HTMLElement, number>();
+    // deal a deck: pre-deal pose → fan (CSS transitions with staggered delays); then picking reacts instantly
+    const dealIn = (deck: HTMLElement) => {
+      clearTimeout(timers.get(deck));
+      deck.classList.remove('is-dealt', 'is-ready');
+      void deck.offsetWidth;
+      deck.classList.add('is-dealt');
+      timers.set(deck, window.setTimeout(() => deck.classList.add('is-ready'), reduced ? 0 : 2200));
+    };
+    const pick = (deck: HTMLElement, card: HTMLElement) => {
+      // the picked ticket takes the front slot and the front one takes its place — the fan stays symmetric
+      const front = deck.querySelector<HTMLElement>('[data-tk].is-on');
+      deck.classList.add('is-ready');
+      if (front && front !== card) { front.style.setProperty('--i', card.style.getPropertyValue('--i')); front.classList.remove('is-on'); }
+      card.style.setProperty('--i', '0'); card.classList.add('is-on');
+    };
+    tf.querySelectorAll<HTMLElement>('[data-deck]').forEach((deck) => {
+      deck.querySelectorAll<HTMLElement>('[data-tk]').forEach((c) => {
+        c.addEventListener('click', (e) => {
+          // a back ticket (even its button) is pulled out first instead of jumping to the form
+          if (!c.classList.contains('is-on')) { e.preventDefault(); pick(deck, c); }
+        });
+        c.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !c.classList.contains('is-on')) pick(deck, c); });
+      });
+    });
+    // first deal when the deck comes into view
+    const first = tf.querySelector<HTMLElement>('[data-deck]:not([hidden])');
+    if (first) {
+      if (reduced) dealIn(first);
+      else new IntersectionObserver(([e], o) => { if (e.isIntersecting) { o.disconnect(); dealIn(first); } }, { threshold: 0.25 }).observe(first);
+    }
+    // tabs: show the set and deal it again
+    tf.querySelectorAll<HTMLButtonElement>('[data-tf-tab]').forEach((b) => b.addEventListener('click', () => {
+      tf.querySelectorAll('[data-tf-tab]').forEach((x) => { x.classList.toggle('is-on', x === b); x.setAttribute('aria-selected', String(x === b)); });
+      tf.querySelectorAll<HTMLElement>('[data-tf-set]').forEach((s) => { const on = s.dataset.tfSet === b.dataset.tfTab; s.hidden = !on; if (on) dealIn(s); });
+    }));
+    // booking pop-up
+    const dlg = tf.querySelector<HTMLDialogElement>('[data-bk]')!;
+    const form = dlg.querySelector<HTMLFormElement>('[data-tf-form]')!, done = dlg.querySelector<HTMLElement>('[data-tf-sent]')!;
+    const pack = dlg.querySelector<HTMLInputElement>('[data-tf-pack]')!, tkBox = dlg.querySelector<HTMLElement>('[data-bk-ticket]')!;
+    const open = (a?: HTMLAnchorElement) => {
+      form.hidden = false; done.hidden = true;
+      if (a?.dataset.tfPick) {
+        const [, name] = a.dataset.tfPick.split(' · ');
+        pack.value = a.dataset.tfPick;
+        dlg.querySelector('[data-bk-name]')!.textContent = name;
+        dlg.querySelector('[data-bk-time]')!.textContent = a.dataset.time ?? '';
+        dlg.querySelector('[data-bk-list]')!.innerHTML = (a.dataset.list ?? '').split('|').filter(Boolean).map((x) => `<li>${x}</li>`).join('');
+        tkBox.hidden = false;
+      } else { pack.value = ''; tkBox.hidden = true; }
+      dlg.showModal();
+      requestAnimationFrame(() => form.querySelector<HTMLInputElement>('input[name=name]')!.focus());
+    };
+    tf.querySelectorAll<HTMLAnchorElement>('[data-tf-pick]').forEach((a) => a.addEventListener('click', (e) => {
+      if (!a.closest('[data-tk]')?.classList.contains('is-on')) return;   // back ticket: just pulled out
+      e.preventDefault(); open(a);
+    }));
+    // every «Записатися» on the page (header CTA etc.) → the same pop-up
+    document.addEventListener('click', (e) => {
+      const a = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[href$="#booking"]');
+      if (!a || a.hasAttribute('data-tf-pick')) return;
+      e.preventDefault(); open();
+    });
+    dlg.querySelectorAll('[data-bk-close]').forEach((b) => b.addEventListener('click', () => dlg.close()));
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });   // click on the backdrop
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const ph = form.querySelector<HTMLInputElement>('input[name=phone]')!;
+      if (!ph.value.trim()) { ph.focus(); ph.style.boxShadow = 'inset 0 0 0 1.5px var(--accent)'; return; }
+      form.hidden = true; done.hidden = false;   // nothing is sent until a backend exists
+    });
+  });
+</script>

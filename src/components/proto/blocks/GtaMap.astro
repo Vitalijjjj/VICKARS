@@ -1,0 +1,242 @@
+---
+/**
+ * «Де ми на карті» — a pause-menu game map (our own design, no game assets or fonts): dark-grey land with light-grey
+ * roads; the sea is see-through, revealing a blurred night scene behind the map; a full-width crosshair follows the
+ * pointer and rests on the VIK blip; colour icons mark real places nearby; a purple GPS route runs from the Old Port
+ * to VIK Cars (OSRM, live). Tiles: Esri Dark Gray Canvas. Wheel-zoom is off so the page scroll is never hijacked.
+ */
+import 'leaflet/dist/leaflet.css';
+import badge from '@/assets/brand/vikcars-badge.svg?raw';
+import { business } from '@/config/business';
+const { lat, lng } = business.geo;
+const from = { lat: 34.6714, lng: 33.0433, name: 'Старий порт' };
+// real places nearby, approximate positions: [lat, lng, label, colour, svg icon]
+const pois: [number, number, string, string, string][] = [
+  [34.6706, 33.0409, 'Марина Лімасолу', '#43b5ff', '<svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v13M8 11h8M5 14a7 7 0 0 0 14 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'],
+  [34.6722, 33.0418, 'Лімасольський замок', '#ffcf3d', '<svg viewBox="0 0 24 24"><path d="M5 21h14M7 21V10h10v11M7 10V5h2v2h2V5h2v2h2V5h2v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>'],
+  [34.6826, 33.0386, 'Міський сад', '#4ed37a', '<svg viewBox="0 0 24 24"><path d="M12 21v-7M12 14c-4 0-6-3-6-6a6 6 0 0 1 12 0c0 3-2 6-6 6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'],
+  [34.6788, 33.0496, 'Набережна Молос', '#ff6fb5', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="currentColor"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'],
+];
+---
+
+<div class="gm" data-gm data-lat={lat} data-lng={lng} data-from-lat={from.lat} data-from-lng={from.lng} data-pois={JSON.stringify(pois)}>
+  <div class="gm__scene" aria-hidden="true"><img src="/media/level-lounge-showroom-v2.webp" alt="" loading="lazy" /></div>
+  <div class="gm__map" data-gm-map aria-label="Карта: маршрут від Старого порту до VIK Cars" role="img"></div>
+  <i class="gm__vignette" aria-hidden="true"></i>
+
+  <!-- crosshair: follows the pointer, rests on the VIK blip -->
+  <div class="gm__cross" data-gm-cross aria-hidden="true">
+    <i class="gm__cross-h"></i><i class="gm__cross-v"></i>
+    <svg class="gm__cursor" viewBox="0 0 24 24"><path d="M5 3l14 8-6.2 1.6L10 19z" /></svg>
+  </div>
+
+  <div class="gm__legend">
+    <p class="gm__legend-h">Мітка · VIK Cars</p>
+    <p class="gm__eta"><b data-gm-time>≈ 13 хв</b><span data-gm-dist>7,6 км</span></p>
+    <p class="gm__from">від: <span data-gm-from>{from.name}</span></p>
+    <button class="gm__me" type="button" data-gm-me>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="currentColor"/><path d="M12 2.5v3.2M12 18.3v3.2M2.5 12h3.2M18.3 12h3.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+      <span data-gm-me-label>Маршрут від мене</span>
+    </button>
+    <p class="gm__note" data-gm-note hidden></p>
+    <ul class="gm__keys">
+      <li><span class="gm__k gm__k--vik" set:html={badge} />VIK Cars</li>
+      <li><span class="gm__k gm__k--route"></span>Маршрут</li>
+      {pois.map(([, , n, c, g]) => <li><span class="gm__k gm__k--poi" style={`--c:${c}`} set:html={g} />{n}</li>)}
+    </ul>
+  </div>
+
+  <div class="gm__zoom">
+    <button type="button" data-gm-in aria-label="Наблизити">+</button>
+    <button type="button" data-gm-out aria-label="Віддалити">−</button>
+    <button type="button" data-gm-fit aria-label="Показати весь маршрут"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  </div>
+
+  <p class="gm__attr">Map © Esri, HERE, Garmin, OpenStreetMap · Route © OSRM</p>
+  <template data-gm-badge set:html={badge} />
+  <!-- tile grade: grey levels → the site's warm dark land (#2a231f) / warm cream roads, and the (darker) sea → transparent -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <filter id="gm-grade" color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix" values="0.733 2.465 0.249 0 -0.793  0.713 2.4 0.242 0 -0.796  0.657 2.211 0.223 0 -0.737  2.55 8.58 0.87 0 -1.92" />
+    </filter>
+  </svg>
+</div>
+
+<style>
+  .gm { position: absolute; inset: 0; overflow: hidden; background: #1d1815; cursor: none; }
+  /* the "game scene" behind the map, seen through the sea */
+  .gm__scene { position: absolute; inset: -40px; }
+  .gm__scene img { width: 100%; height: 100%; object-fit: cover; filter: blur(18px) brightness(0.42) saturate(0.6) sepia(0.35) contrast(1.05); }
+  .gm__map { position: absolute; inset: 0; z-index: 1; background: transparent !important; }
+  .gm :global(.leaflet-container) { background: transparent !important; font-family: var(--font-sans); outline: none; cursor: none; }
+  /* dark land, light roads; the sea is cut to transparent by #gm-grade, so the scene shows through */
+  .gm :global(.gm-base) { filter: url(#gm-grade); }
+  /* volume: every edge melts into the page colour, plus a soft warm light from above */
+  .gm__vignette { position: absolute; inset: 0; z-index: 450; pointer-events: none; background:
+    linear-gradient(90deg, #1d1815 0%, rgb(29 24 21 / 0) 16%, rgb(29 24 21 / 0) 84%, #1d1815 100%),
+    linear-gradient(180deg, #1d1815 0%, rgb(29 24 21 / 0) 18%, rgb(29 24 21 / 0) 80%, #1d1815 100%),
+    radial-gradient(70% 55% at 55% 35%, rgb(244 230 216 / 0.06), transparent 70%),
+    radial-gradient(130% 110% at 55% 45%, transparent 55%, rgb(17 13 11 / 0.55) 100%); }
+
+  /* route */
+  .gm :global(.gm-route-glow) { filter: blur(4px); }
+  .gm :global(.gm-route) { stroke-linecap: round; stroke-linejoin: round; }
+
+  /* blips */
+  .gm :global(.gm-blip) { position: relative; display: block; width: 52px; height: 52px; }
+  .gm :global(.gm-blip__pulse) { display: block; position: absolute; inset: 0; border-radius: 50%; background: rgb(229 37 50 / 0.4); animation: gm-pulse 2.2s ease-out infinite; }
+  .gm :global(.gm-blip__disc) { position: absolute; inset: 8px; display: grid; place-items: center; border-radius: 50%; background: #111; box-shadow: 0 0 0 2.5px #fff, 0 4px 14px rgb(0 0 0 / 0.6); }
+  .gm :global(.gm-blip__disc svg) { width: 24px; height: auto; }
+  .gm :global(.gm-you) { width: 30px; height: 30px; display: grid !important; place-items: center; filter: drop-shadow(0 2px 4px rgb(0 0 0 / 0.8)); }
+  .gm :global(.gm-you svg) { width: 26px; height: 26px; }
+  .gm :global(.gm-poi svg) { width: 16px; height: 16px; }
+  .gm__k--poi :global(svg) { width: 13px !important; height: 13px; }
+  .gm :global(.gm-poi) { display: grid !important; place-items: center; width: 26px; height: 26px; border-radius: 7px; font: 700 14px/1 var(--font-sans); color: #111; background: var(--c); box-shadow: 0 0 0 2px rgb(0 0 0 / 0.55), 0 3px 8px rgb(0 0 0 / 0.6); }
+  @keyframes gm-pulse { from { transform: scale(0.6); opacity: 1; } to { transform: scale(1.8); opacity: 0; } }
+
+  /* crosshair */
+  .gm__cross { position: absolute; inset: 0; z-index: 900; pointer-events: none; --x: 50%; --y: 50%; }
+  .gm__cross-h { position: absolute; left: 0; right: 0; top: var(--y); height: 1.5px; translate: 0 -50%; background: linear-gradient(90deg, transparent, rgb(244 230 216 / 0.7) 15%, rgb(244 230 216 / 0.7) 85%, transparent); }
+  .gm__cross-v { position: absolute; top: 0; bottom: 0; left: var(--x); width: 1.5px; translate: -50% 0; background: linear-gradient(180deg, transparent, rgb(244 230 216 / 0.7) 15%, rgb(244 230 216 / 0.7) 85%, transparent); }
+  .gm__cursor { position: absolute; left: var(--x); top: var(--y); width: 26px; height: 26px; translate: -3px -2px; filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.7)); }
+  .gm__cursor path { fill: #f4e6d8; stroke: #1a1a1a; stroke-width: 1.2; stroke-linejoin: round; }
+  .gm__cross.is-rest .gm__cross-h, .gm__cross.is-rest .gm__cross-v, .gm__cross.is-rest .gm__cursor { transition: top 0.7s cubic-bezier(0.22, 1, 0.36, 1), left 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
+
+  /* legend */
+  .gm__legend { position: absolute; z-index: 1000; right: 24px; top: 24px; width: 260px; display: grid; gap: 10px; padding: 16px 18px; border-radius: 4px; color: #fff; background: rgb(29 24 21 / 0.86); box-shadow: inset 0 3px 0 var(--accent), inset 0 0 0 1px rgb(244 230 216 / 0.08), 0 20px 50px rgb(0 0 0 / 0.45); }
+  .gm__legend-h { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgb(255 255 255 / 0.7); }
+  .gm__eta { margin: 0; display: flex; align-items: baseline; gap: 12px; }
+  .gm__eta b { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; }
+  .gm__eta span { font-size: 17px; color: rgb(255 255 255 / 0.7); }
+  .gm__from { margin: -4px 0 4px; font-size: 13px; color: rgb(255 255 255 / 0.6); }
+  .gm__me { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border: 0; border-radius: 999px; cursor: pointer; font: 600 13.5px var(--font-sans); color: #fff; background: var(--accent); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3), 0 8px 20px rgb(229 37 50 / 0.35); transition: background 0.3s, opacity 0.3s; }
+  .gm__me:hover { background: var(--accent-deep); }
+  .gm__me svg { width: 18px; height: 18px; }
+  .gm__me.is-busy { opacity: 0.7; pointer-events: none; }
+  .gm__me.is-busy svg { animation: gm-spin 1.2s linear infinite; }
+  @keyframes gm-spin { to { rotate: 1turn; } }
+  .gm__note { margin: 0; font-size: 12px; line-height: 1.4; color: rgb(244 230 216 / 0.7); }
+  .gm__note[hidden] { display: none; }
+  .gm__keys { display: grid; gap: 7px; margin: 0; padding: 10px 0 0; list-style: none; font-size: 13px; border-top: 1px solid rgb(255 255 255 / 0.12); }
+  .gm__keys li { display: flex; align-items: center; gap: 10px; }
+  .gm__k { display: grid; place-items: center; width: 20px; height: 20px; flex: none; border-radius: 50%; background: #111; box-shadow: 0 0 0 1.5px #fff; font: 700 11px/1 var(--font-sans); }
+  .gm__k :global(svg) { width: 12px; height: auto; }
+  .gm__k--route { height: 4px; border-radius: 2px; background: #a35cff; box-shadow: 0 0 8px #a35cff; }
+  .gm__k--poi { border-radius: 5px; color: #111; background: var(--c); box-shadow: none; }
+
+  .gm__zoom { position: absolute; z-index: 1000; right: 24px; bottom: 30px; display: grid; gap: 6px; }
+  .gm__zoom button { display: grid; place-items: center; width: 42px; height: 42px; border: 0; border-radius: 4px; cursor: pointer; font: 600 22px/1 var(--font-sans); color: #fff; background: rgb(29 24 21 / 0.86); box-shadow: inset 0 0 0 1px rgb(244 230 216 / 0.12); }
+  .gm__zoom button:hover { background: var(--accent); }
+  .gm__zoom svg { width: 20px; height: 20px; }
+  .gm__attr { position: absolute; z-index: 1000; right: 80px; bottom: 8px; margin: 0; font-size: 10px; color: rgb(255 255 255 / 0.5); }
+
+  @media (max-width: 900px) {
+    .gm, .gm :global(.leaflet-container) { cursor: auto; }
+    .gm__cursor { display: none; }
+    .gm__legend { left: 12px; right: 12px; top: 12px; width: auto; padding: 12px 14px; }
+    .gm__keys { display: none; }
+    .gm__legend { grid-template-columns: 1fr auto; align-items: center; }
+    .gm__legend-h, .gm__from, .gm__note { grid-column: 1 / -1; }
+    .gm__me { grid-column: 2; grid-row: 2; height: 36px; padding: 0 12px; font-size: 12.5px; }
+    .gm__eta b { font-size: 22px; }
+    .gm__zoom { right: 12px; bottom: 12px; grid-auto-flow: column; }
+    .gm__attr { left: 12px; right: auto; bottom: 62px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .gm :global(.gm-blip__pulse) { animation: none; } }
+</style>
+
+<script>
+  import L from 'leaflet';
+  const BASE = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+  const PURPLE = '#a35cff';
+
+  document.querySelectorAll<HTMLElement>('[data-gm]').forEach((root) => {
+    const to = L.latLng(Number(root.dataset.lat), Number(root.dataset.lng));
+    const from = L.latLng(Number(root.dataset.fromLat), Number(root.dataset.fromLng));
+    const pois = JSON.parse(root.dataset.pois || '[]') as [number, number, string, string, string][];
+    const badge = (root.querySelector('template[data-gm-badge]') as HTMLTemplateElement).innerHTML;
+    const cross = root.querySelector<HTMLElement>('[data-gm-cross]')!;
+    const narrow = () => innerWidth < 900;
+    let built = false;
+
+    const build = async () => {
+      if (built) return; built = true;
+      const map = L.map(root.querySelector<HTMLElement>('[data-gm-map]')!, { zoomControl: false, attributionControl: false, scrollWheelZoom: false, zoomSnap: 0.25 });
+      L.tileLayer(BASE, { maxZoom: 16, className: 'gm-base' }).addTo(map);
+
+      // route from any origin: OSRM (live), a straight line as a fallback
+      const glow = L.polyline([], { color: PURPLE, weight: 14, opacity: 0.3, className: 'gm-route-glow', interactive: false }).addTo(map);
+      const main = L.polyline([], { color: PURPLE, weight: 6, opacity: 1, className: 'gm-route', interactive: false }).addTo(map);
+      const youIcon = (deg: number) => L.divIcon({ className: '', iconSize: [30, 30], iconAnchor: [15, 15], html: `<span class="gm-you" style="transform:rotate(${deg}deg)"><svg viewBox="0 0 24 24"><path d="M12 2l7 19-7-4-7 4z" fill="#fff" stroke="#111" stroke-width="1"/></svg></span>` });
+      const you = L.marker(from, { interactive: false, icon: youIcon(0) }).addTo(map);
+      const drawIn = () => {
+        const path = (main as unknown as { _path?: SVGPathElement })._path;
+        if (!path || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const len = path.getTotalLength();
+        path.style.transition = 'none'; path.style.strokeDasharray = `${len}`; path.style.strokeDashoffset = `${len}`;
+        requestAnimationFrame(() => requestAnimationFrame(() => { path.style.transition = 'stroke-dashoffset 2.4s cubic-bezier(.22,1,.36,1)'; path.style.strokeDashoffset = '0'; }));
+      };
+      map.on('zoomstart', () => { const path = (main as unknown as { _path?: SVGPathElement })._path; if (path) { path.style.transition = 'none'; path.style.strokeDasharray = 'none'; } });
+      const route = async (origin: L.LatLng) => {
+        let line: L.LatLng[] = [origin, to];
+        try {
+          const r = await fetch(`https://router.project-osrm.org/route/v1/driving/${origin.lng},${origin.lat};${to.lng},${to.lat}?overview=full&geometries=geojson`);
+          const rt = (await r.json()).routes?.[0];
+          if (rt) {
+            line = rt.geometry.coordinates.map(([x, y]: [number, number]) => L.latLng(y, x));
+            const min = Math.max(1, Math.round(rt.duration / 60));
+            root.querySelector<HTMLElement>('[data-gm-time]')!.textContent = min >= 60 ? `≈ ${Math.floor(min / 60)} год ${min % 60} хв` : `≈ ${min} хв`;
+            root.querySelector<HTMLElement>('[data-gm-dist]')!.textContent = `${(rt.distance / 1000).toFixed(1).replace('.', ',')} км`;
+          }
+        } catch { /* offline → straight line */ }
+        glow.setLatLngs(line); main.setLatLngs(line);
+        const a = line[0], b = line[Math.min(3, line.length - 1)];
+        you.setLatLng(origin).setIcon(youIcon((Math.atan2(b.lng - a.lng, b.lat - a.lat) * 180) / Math.PI));
+        drawIn();
+      };
+      await route(from);
+      pois.forEach(([la, ln, name, c, g]) => L.marker([la, ln], { title: name, icon: L.divIcon({ className: '', iconSize: [26, 26], iconAnchor: [13, 13], html: `<span class="gm-poi" style="--c:${c}" title="${name}">${g}</span>` }) }).addTo(map));
+      const vik = L.marker(to, { interactive: false, icon: L.divIcon({ className: '', iconSize: [52, 52], iconAnchor: [26, 26], html: `<span class="gm-blip"><i class="gm-blip__pulse"></i><span class="gm-blip__disc">${badge}</span></span>` }) }).addTo(map);
+
+      const fit = () => map.fitBounds(main.getBounds(), narrow() ? { paddingTopLeft: [24, 120], paddingBottomRight: [24, 80] } : { paddingTopLeft: [480, 80], paddingBottomRight: [330, 80] });
+      fit();
+
+      // crosshair: follow the pointer; at rest it glides back onto the VIK blip
+      const rest = () => { const p = map.latLngToContainerPoint(vik.getLatLng()); cross.classList.add('is-rest'); cross.style.setProperty('--x', `${p.x}px`); cross.style.setProperty('--y', `${p.y}px`); };
+      root.addEventListener('pointermove', (e) => {
+        if (e.pointerType !== 'mouse') return;
+        const r = root.getBoundingClientRect();
+        cross.classList.remove('is-rest');
+        cross.style.setProperty('--x', `${e.clientX - r.left}px`); cross.style.setProperty('--y', `${e.clientY - r.top}px`);
+      });
+      root.addEventListener('pointerleave', rest);
+      map.on('move zoom', () => { if (cross.classList.contains('is-rest')) rest(); });
+      rest();
+
+      root.querySelector('[data-gm-in]')!.addEventListener('click', () => map.zoomIn());
+      root.querySelector('[data-gm-out]')!.addEventListener('click', () => map.zoomOut());
+      root.querySelector('[data-gm-fit]')!.addEventListener('click', fit);
+      // «Маршрут від мене»: the visitor's real position, asked only on click; outside Cyprus we keep the default route
+      const meBtn = root.querySelector<HTMLButtonElement>('[data-gm-me]')!, note = root.querySelector<HTMLElement>('[data-gm-note]')!;
+      const say = (t: string) => { note.textContent = t; note.hidden = !t; };
+      meBtn.addEventListener('click', () => {
+        if (!('geolocation' in navigator)) { say('Ваш браузер не підтримує геолокацію.'); return; }
+        meBtn.classList.add('is-busy'); say('');
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+          const me = L.latLng(pos.coords.latitude, pos.coords.longitude);
+          if (me.distanceTo(to) > 250_000) { meBtn.classList.remove('is-busy'); say('Схоже, ви зараз не на Кіпрі — показуємо маршрут від Старого порту.'); return; }
+          await route(me);
+          root.querySelector<HTMLElement>('[data-gm-from]')!.textContent = 'ваше місце';
+          meBtn.classList.remove('is-busy');
+          root.querySelector<HTMLElement>('[data-gm-me-label]')!.textContent = 'Оновити';
+          fit();
+        }, (err) => {
+          meBtn.classList.remove('is-busy');
+          say(err.code === err.PERMISSION_DENIED ? 'Доступ до геолокації заборонено — дозвольте його в налаштуваннях браузера.' : 'Не вдалося визначити місце. Спробуйте ще раз.');
+        }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 });
+      });
+      addEventListener('resize', () => { map.invalidateSize(); rest(); });
+    };
+    new IntersectionObserver(([e], o) => { if (e.isIntersecting) { o.disconnect(); build(); } }, { rootMargin: '300px' }).observe(root);
+  });
+</script>

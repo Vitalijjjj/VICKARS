@@ -1,0 +1,149 @@
+---
+/**
+ * Direction page in the new design (UA): 00 Ручна мийка, −01 Детейлінг-студія, +01 Лаунж і шоурум, Самомийка.
+ * Structure from the client sitemap: nav · first screen (video/still) · cases · process · CTA + packages ·
+ * what you get · Google reviews · CTA + contacts + map · footer.
+ * Copy is a DRAFT for the client; cases/reviews/prices are placeholders until real material arrives.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import '@/styles/proto.css';
+import DirHero from './blocks/DirHero.astro';
+import Cases from './blocks/Cases.astro';
+import DirProcess from './blocks/DirProcess.astro';
+import Tariffs from './blocks/Tariffs.astro';
+import Benefits from './blocks/Benefits.astro';
+import Reviews from './blocks/Reviews.astro';
+import ContactsMap from './blocks/ContactsMap.astro';
+import GlassFooter from './blocks/GlassFooter.astro';
+import SelfWashScrub from './blocks/SelfWashScrub.astro';
+import Ambience from './blocks/Ambience.astro';
+import Journey from './blocks/Journey.astro';
+import Story from './blocks/Story.astro';
+import Protect from './blocks/Protect.astro';
+import Quiz from './blocks/Quiz.astro';
+import Journal from './blocks/Journal.astro';
+
+export type DirSlug = 'car-wash' | 'detailing-studio' | 'lounge-showroom' | 'self-wash';
+interface Props { slug: DirSlug }
+const { slug } = Astro.props;
+const m = '/media/';
+const sm = (n: string) => `${m}${n}-sm.webp`;
+
+type Case = { name: string; service: string; time: string; image: string; note: string };
+interface Dir {
+  code: string; title: string; lead: string; image: string; video?: string; facts: [string, string][];
+  cases?: Case[]; steps: [string, string, string][]; tariffs: 'wash' | 'studio' | 'self' | 'lounge';
+  benefits: [string, string, string][]; footer: string; intro?: 'self';
+  /** blocks moved off the home page that live on this direction */
+  journey?: boolean; story?: boolean; protect?: boolean; quiz?: boolean; journal?: boolean;
+}
+const D: Record<DirSlug, Dir> = {
+  'car-wash': {
+    code: '00', title: 'Ручна мийка', image: `${m}level-car-wash-v2.webp`, video: `${m}journey-wash-v1.mp4`,
+    lead: 'Шість постів ручної мийки преміум-класу. Піна, мікрофібра й жодних автоматичних щіток — від огляду до видачі.',
+    facts: [['6', 'постів'], ['≈ 60', 'хв на авто'], ['0', 'щіток'], ['+01', 'лаунж нагорі']],
+    cases: [
+      { name: 'Porsche 911 · кераміка', service: 'Мийка + кераміка', time: '1 день', image: `${m}level-detailing-studio-v2.webp`, note: 'Двофазна мийка, деконтамінація, полірування в один крок і кераміка 1 шар.' },
+      { name: 'Range Rover · Signature', service: 'Ручна мийка Signature', time: '3 год', image: `${m}level-car-wash-v2-s1.webp`, note: 'Очищення бітуму й металу, глибока чистка салону, захисний сілант.' },
+      { name: 'Mercedes S · Premium', service: 'Ручна мийка Premium', time: '90 хв', image: `${m}level-detailing-studio-v2-s1.webp`, note: 'Кузов, диски й арки, салон, скло всередині й зовні, швидкий віск.' },
+    ],
+    steps: [
+      ['Огляд і фото', 'Зустрічаємо, фіксуємо стан авто й надсилаємо фото вам у месенджер.', sm('level-car-wash-v2')],
+      ['Активна піна', 'Розм’якшуємо бруд без контакту — жодних подряпин від піску.', sm('level-car-wash-v2-s1')],
+      ['Ручна мийка', 'Метод двох відер і окрема мікрофібра на кожну зону.', sm('level-car-wash-v2-s2')],
+      ['Сушіння', 'Тепле повітря й рушники з мікрофібри — без розводів.', sm('level-car-wash-v2-s3')],
+      ['Перевірка і видача', 'Майстер проходить чек-лист і передає ключі вам у лаунжі.', sm('level-lounge-showroom-v2-s1')],
+    ],
+    tariffs: 'wash', footer: `${m}level-car-wash-v2.webp`, journey: true,
+    benefits: [
+      ['Фото до і після', 'Стан авто фіксуємо на прийомі й після мийки.', 'cam'], ['Без щіток', 'Тільки руки, піна й мікрофібра — лак залишається цілим.', 'drop'],
+      ['Свій час', 'Запис на годину, без черги на вулиці.', 'clock'], ['Лаунж', 'Кава й Wi-Fi нагорі, поки миємо авто.', 'cup'],
+      ['Чек-лист', 'Майстер підписує кожну видачу.', 'check'], ['Чесна ціна', 'Вартість після огляду — без доплат по ходу.', 'tag'],
+    ],
+  },
+  'detailing-studio': {
+    code: '−01', title: 'Детейлінг-студія', image: `${m}level-detailing-studio-v2.webp`,
+    lead: 'Підземний поверх для PPF, кераміки, тонування й тюнінгу. Чиста зона з контрольованим світлом, куди авто опускається ліфтом.',
+    facts: [['PPF', 'плівка'], ['9H', 'кераміка'], ['1–4', 'дні'], ['10', 'років гарантії']],
+    cases: [
+      { name: 'Porsche 911 · PPF Full', service: 'Повне оклеювання PPF', time: '4 дні', image: `${m}level-detailing-studio-v2-s1.webp`, note: 'Демонтаж емблем, плівка з самовідновленням на весь кузов, загортання країв.' },
+      { name: 'BMW M5 · кераміка', service: 'Полірування + кераміка', time: '2 дні', image: `${m}level-detailing-studio-v2-s2.webp`, note: 'Двокрокове полірування, знежирення, кераміка 2 шари, диски й скло.' },
+      { name: 'Range Rover · тонування', service: 'Тонування + PPF фари', time: '1 день', image: `${m}level-detailing-studio-v2-s3.webp`, note: 'Атермальна плівка на задню півсферу й захист фар.' },
+    ],
+    steps: [
+      ['Огляд і замір', 'Дивимося лак під світлом, міряємо товщину й погоджуємо план.', sm('level-detailing-studio-v2')],
+      ['Деконтамінація', 'Глина, очищувачі металу й бітуму — поверхня до нуля.', sm('level-detailing-studio-v2-s1')],
+      ['Полірування', 'Прибираємо голограми й дрібні подряпини перед захистом.', sm('level-detailing-studio-v2-s2')],
+      ['Захист', 'PPF, кераміка або тонування — в чистій зоні без пилу.', sm('level-detailing-studio-v2-s3')],
+      ['Контроль і видача', 'Перевірка під різним світлом, гарантійний талон, інструкція з догляду.', sm('level-lounge-showroom-v2-s1')],
+    ],
+    tariffs: 'studio', footer: `${m}level-detailing-studio-v2.webp`, protect: true, quiz: true, journal: true,
+    benefits: [
+      ['Чиста зона', 'Окремий поверх без пилу й протягів — плівка лягає без включень.', 'sparkle'], ['Гарантія', 'До 10 років на PPF і графік обслуговування кераміки.', 'shield'],
+      ['Світло', 'Контрольне освітлення показує кожен дефект до і після.', 'light'], ['Звіт', 'Фото кожного етапу у вашому месенджері.', 'phone'],
+      ['Ліфт', 'Авто опускається на −01 без зайвих кілометрів.', 'lift'], ['Лаунж', 'Чекати можна нагорі або забрати авто пізніше.', 'cup'],
+    ],
+  },
+  'lounge-showroom': {
+    code: '+01', title: 'Лаунж і шоурум', image: `${m}level-lounge-showroom-v2.webp`,
+    lead: 'Поки авто в роботі — кава, тиша й панорама на пагорби. Тут же шоурум і консультації з детейлінгу та плівок.',
+    facts: [['360°', 'панорама'], ['Wi-Fi', 'робоча зона'], ['24', 'види кави й чаю'], ['4', 'місця в переговорній']],
+    steps: [
+      ['Передаєте ключі', 'Прийом на 00 займає кілька хвилин — з фото й чек-листом.', sm('level-car-wash-v2')],
+      ['Піднімаєтеся', 'Ліфт або сходи — і ви в лаунжі на +01.', sm('level-lounge-showroom-v2-s1')],
+      ['Відпочиваєте', 'Кава, робоче місце або переговорна — як зручно.', sm('level-lounge-showroom-v2-s2')],
+      ['Стежите за процесом', 'Фото кожного етапу приходять вам у месенджер.', sm('level-lounge-showroom-v2-s3')],
+      ['Забираєте авто', 'Майстер приносить ключі й показує результат.', sm('level-lounge-showroom-v2')],
+    ],
+    tariffs: 'lounge', footer: `${m}level-lounge-showroom-v2-s2.webp`, story: true,
+    benefits: [
+      ['Не на вулиці', 'Жодних табуреток біля мийки — чекаєте з видом на пагорби.', 'cup'], ['Робоча зона', 'Тиша, Wi-Fi і зарядки, щоб час не пропадав.', 'wifi'],
+      ['Переговорна', 'Можна провести зустріч, поки миють авто.', 'room'], ['Консультації', 'Підбір плівки й кераміки прямо в шоурумі.', 'chat'],
+      ['Презентації', 'Приватні покази авто й вечори для клієнтів.', 'star'], ['Звіт онлайн', 'Фото процесу — у вашому телефоні.', 'phone'],
+    ],
+  },
+  'self-wash': {
+    code: 'SW', title: 'Самомийка', image: `${m}level-car-wash-v2-s3.webp`, intro: 'self',
+    lead: 'Професійні засоби й обладнання — керуєте ви. Без запису, оплата карткою прямо на посту.',
+    facts: [['4', 'програми'], ['€ —', 'за хвилину'], ['0', 'записів'], ['NFC', 'оплата карткою']],
+    steps: [
+      ['Заїжджаєте на пост', 'Вільний пост видно з дороги — без запису й черги.', sm('level-car-wash-v2-s3')],
+      ['Оплачуєте', 'Карткою або телефоном прямо на терміналі посту.', sm('level-car-wash-v2')],
+      ['Обираєте програму', 'Піна, вода, віск чи осмос — перемикаєте будь-коли.', sm('level-car-wash-v2-s1')],
+      ['Миєте', 'Таймер рахує лише поки працює програма.', sm('level-car-wash-v2-s2')],
+      ['Фініш', 'Осмос без розводів — і можна їхати.', sm('level-detailing-studio-v2-s1')],
+    ],
+    tariffs: 'self', footer: `${m}level-car-wash-v2-s3.webp`,
+    benefits: [
+      ['Без запису', 'Приїжджаєте, коли зручно.', 'clock'], ['Проф. хімія', 'Ті самі засоби, що й на ручній мийці.', 'sparkle'],
+      ['Чесні хвилини', 'Платите лише за роботу програми.', 'tag'], ['Осмос', 'Фінальне ополіскування без розводів.', 'drop'],
+      ['Картка', 'Оплата на посту — без жетонів.', 'card'], ['Поруч допомога', 'Майстер ручної мийки підкаже, якщо потрібно.', 'user'],
+    ],
+  },
+};
+const d = D[slug];
+---
+
+<BaseLayout locale="uk" path={`/levels/${slug}/`} title={`${d.title} — VIK Cars, Лімасол`} footer={false} preload={d.image}>
+  <div class="dl" data-pt style="background:#1d1815">
+    <Ambience />
+    <DirHero code={d.code} title={d.title} lead={d.lead} image={d.image} video={d.video} facts={d.facts} />
+    {d.intro === 'self' && <SelfWashScrub ctaLabel="Обрати пакет" ctaHref="#pricing" />}
+    {d.story && <Story />}
+    {d.cases && <Cases cases={d.cases} isNew={false} />}
+    {d.journey ? <Journey /> : <DirProcess steps={d.steps} isNew={false} />}
+    {d.protect && <Protect />}
+    {d.quiz && <Quiz />}
+    <Tariffs only={d.tariffs} isNew={false} />
+    <Benefits items={d.benefits} isNew={false} />
+    <Reviews isNew={false} />
+    {d.journal && <Journal />}
+    <ContactsMap isNew={false} />
+    <GlassFooter image={d.footer} />
+  </div>
+</BaseLayout>
+
+<script>
+  import { initProto } from '@/scripts/proto';
+  initProto();
+</script>

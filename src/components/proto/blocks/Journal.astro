@@ -1,0 +1,49 @@
+---
+/** «Журнал VIK» — tips and news cards (moved from home). Topics are drafts. */
+const m = '/media/';
+const img = (n: string, sm = false) => `${m}${n}${sm ? '-sm' : ''}.webp`;
+const posts = [
+  ['level-detailing-studio-v2-s2', 'Як пережити кіпрське літо без вигорілого лаку', 'Поради', '2026-06-02'],
+  ['level-detailing-studio-v2-s1', 'PPF чи кераміка: що обрати для нового авто', 'Детейлінг', '2026-05-14'],
+  ['level-lounge-showroom-v2-s1', 'VIK Cars відкривається в Лімасолі', 'Новини', '2026-04-20'],
+];
+const arrow = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+---
+
+  <!-- ============================================================ 6 · journal -->
+  <section class="dl-sec dl-journal" id="journal" data-bg="#f6e4d6" data-theme="light">
+    <div class="dl-journal__l" data-up>
+      <h2 class="dl-serif">Журнал<br />VIK</h2>
+      <p class="dl-body">Поради з догляду, історії авто й новини комплексу</p>
+      <div class="dl-cta"><a class="dl-pill dl-pill--light" href="#">Усі статті</a><a class="dl-round" href="#" aria-label="Усі статті" set:html={arrow} /></div>
+    </div>
+    <div class="dl-journal__cards">
+      {posts.map(([src, t, tag, date], i) => (
+        <article class="dl-card" data-up style={`--dy:${i * 56}px`}>
+          <figure><img src={img(src, true)} alt="" loading="lazy" /></figure>
+          <h3>{t}</h3>
+          <p><span class="dl-tag">{tag}</span> — {date}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+<style>
+  /* ---------------------------------------------------------- 6 journal */
+  .dl-journal { display: grid; grid-template-columns: 0.8fr 2fr; gap: clamp(32px, 5vw, 80px); padding-bottom: clamp(160px, 16vw, 240px); }
+  .dl-journal__l { display: grid; align-content: start; gap: 22px; }
+  .dl-journal__l .dl-body { max-width: 22ch; color: var(--ink); font-size: 20px; }
+  .dl-journal__cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: start; }
+  .dl-card { display: grid; gap: 14px; transform: translateY(var(--dy)); }
+  .dl-card figure { margin: 0; aspect-ratio: 4 / 5; border-radius: 8px; overflow: hidden; }
+  .dl-card img { width: 100%; height: 100%; object-fit: cover; }
+  .dl-card h3 { margin: 0; font-size: 19px; font-weight: 500; line-height: 1.3; letter-spacing: -0.02em; color: var(--ink); }
+  .dl-card p { margin: 0; font-size: 13px; color: var(--ink-2); }
+  .dl-tag { display: inline-block; padding: 4px 10px; border-radius: 999px; box-shadow: inset 0 0 0 1px rgb(36 28 23 / 0.25); color: var(--ink); }
+
+  @media (max-width: 900px) {
+    .dl-culture, .dl-journal { grid-template-columns: 1fr; }
+    .dl-journal__cards { grid-template-columns: 1fr; }
+    .dl-card { transform: none; }
+  }
+</style>

@@ -1,0 +1,22 @@
+---
+/**
+ * Home page composition. Blocks 01–02 are one continuous pinned stage (CinemaStage).
+ * Future sections (see src/config/site.ts → homeSections) will be appended below in this order:
+ * self-wash · clients · pricing (CTA form) · benefits · reviews · contacts (CTA) · map · footer.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import CinemaStage from '@/components/home/CinemaStage.astro';
+import HomeSections from '@/components/home/HomeSections.astro';
+import DeltaSections from '@/components/proto/DeltaSections.astro';
+import type { Locale } from '@/i18n/ui';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+---
+
+<!-- UA runs the new design (blocks + glass footer inside DeltaSections); RU/EL keep the previous sections
+     until the new copy is translated. -->
+<BaseLayout locale={locale} path="/" footer={locale !== 'uk'}>
+  <CinemaStage locale={locale} />
+  {locale === 'uk' ? <DeltaSections /> : <HomeSections locale={locale} />}
+</BaseLayout>

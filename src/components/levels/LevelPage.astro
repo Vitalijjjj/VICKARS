@@ -1,0 +1,391 @@
+---
+/**
+ * Level landing (+01 / 00 / −01). Arrived at through the building → level transition (see scripts/cinema.ts →
+ * goToLevel): the hero image and the title carry the same view-transition names as the transition overlay on the
+ * home page, so the "window" and the title land here without a cut.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { levels } from '@/config/building';
+import { booking } from '@/config/site';
+import { useTranslations, localePath, type Locale } from '@/i18n/ui';
+import { levelCopy, levelShared, type LevelId } from '@/i18n/levels';
+
+interface Props { locale: Locale; id: LevelId }
+const { locale, id } = Astro.props;
+const t = useTranslations(locale);
+const level = levels.find((l) => l.id === id)!;
+const copy = levelCopy[locale][id];
+const shared = levelShared[locale];
+const others = levels.filter((l) => l.id !== id);
+const sm = (src: string) => src.replace('.webp', '-sm.webp');
+// hero slider: the interior the transition lands on, then three more views of the level
+const slides = [level.image, 1, 2, 3].map((v, i) => ({
+  src: typeof v === 'string' ? v : level.image.replace('.webp', `-s${v}.webp`),
+  caption: copy.slides[i],
+}));
+const SLIDE_MS = 6000;
+---
+
+<BaseLayout locale={locale} path={level.page} title={`${level.name} — VIK Cars`} preload={level.image}>
+  <article class="lvl" data-level-page={level.id}>
+    <header class="lvl__hero">
+      <div class="lvl__slides" data-slides style={`--slide-ms:${SLIDE_MS}ms`}>
+        {slides.map((sl, i) => (
+          <img
+            class:list={['lvl__img', { 'is-on': i === 0 }]}
+            src={sl.src}
+            alt={i === 0 ? `${level.name} — ${t(level.text)}` : sl.caption}
+            fetchpriority={i === 0 ? 'high' : 'low'}
+            decoding="async"
+            data-slide={i}
+          />
+        ))}
+      </div>
+      <div class="lvl__shade" aria-hidden="true"></div>
+      <div class="lvl__head">
+        <a class="lvl__back" href={localePath(locale, '/#complex')}>
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M7.5 2.5 4 6l3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          {shared.back}
+        </a>
+        <h1 class="lvl__title">
+          <span class="lvl__code">{level.code}</span>
+          <span class="lvl__name">{level.name}</span>
+        </h1>
+        <p class="lvl__sub">{t(level.text)}</p>
+      </div>
+      <!-- slider control: caption card + thumbnails whose progress fills while the photo is on -->
+      <div class="lvl__ctrl" data-slider aria-roledescription="carousel" aria-label={level.name}>
+        <div class="lvl__cap">
+          <span class="lvl__count"><b data-count>01</b> / {String(slides.length).padStart(2, '0')}</span>
+          <span class="lvl__cap-txt" data-cap aria-live="polite">{slides[0].caption}</span>
+          <button type="button" class="lvl__next" data-next aria-label={shared.next}>
+            <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6h7M6.5 3l3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          </button>
+        </div>
+        <div class="lvl__thumbs">
+          {slides.map((sl, i) => (
+            <button type="button" class:list={['lvl__thumb', { 'is-on': i === 0 }]} data-thumb={i} data-caption={sl.caption} aria-label={`${shared.slide} ${i + 1}: ${sl.caption}`} aria-current={i === 0 ? 'true' : undefined}>
+              <img src={sm(sl.src)} alt="" loading="lazy" decoding="async" />
+              <i class="lvl__bar" aria-hidden="true"></i>
+            </button>
+          ))}
+        </div>
+      </div>
+    </header>
+
+    <section class="lvl__intro">
+      <p class="lvl__lead">{copy.lead}</p>
+      <dl class="lvl__facts">
+        {copy.facts.map(([v, label]) => (
+          <div class="lvl__fact"><dt>{v}</dt><dd>{label}</dd></div>
+        ))}
+      </dl>
+    </section>
+
+    <nav class="lvl__others" aria-label={shared.others}>
+      <p class="lvl__label">{shared.others}</p>
+      <ul>
+        {others.map((o) => (
+          <li>
+            <a class="lvl__card" href={localePath(locale, o.page)}>
+              <img src={sm(o.image)} alt="" loading="lazy" decoding="async" />
+              <span class="lvl__card-txt"><b>{o.code}</b>{o.name}<em>{t(o.text)}</em></span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <section class="lvl__cta">
+      <h2>{shared.ctaTitle}</h2>
+      <p>{shared.ctaText}</p>
+      {booking.status === 'live'
+        ? <a class="lvl__btn" href={localePath(locale, `/#${booking.id}`)}>{t('cta.book')}</a>
+        : <span class="lvl__btn is-soon" role="link" aria-disabled="true">{t('cta.book')}<em>{t('state.soon')}</em></span>}
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .lvl { background: var(--paper); }
+
+  /* ---------------------------------------------------------- hero */
+  .lvl__hero {
+    position: relative;
+    height: 100vh;
+    height: 100svh;
+    min-height: 560px;
+    overflow: hidden;
+    color: #fff;
+  }
+  .lvl__slides { position: absolute; inset: 0; view-transition-name: level-window; }
+  .lvl__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    opacity: 0;
+    transform: scale(1.06);
+    transition: opacity 1.4s var(--ease-out), transform 1.6s var(--ease-out);
+  }
+  /* the photo on screen fades in and keeps drifting slowly forward */
+  .lvl__img.is-on { opacity: 1; transform: scale(1); animation: lvl-drift calc(var(--slide-ms) + 1600ms) linear both; }
+  .lvl__img:first-child.is-on:not(.was-off) { animation: none; transform: none; }
+  @keyframes lvl-drift { from { transform: scale(1.06); } to { transform: scale(1); } }
+  .lvl__shade {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgb(10 12 14 / 0.28) 0%, rgb(10 12 14 / 0) 24%),
+      linear-gradient(0deg, rgb(10 12 14 / 0.62) 0%, rgb(10 12 14 / 0.22) 34%, rgb(10 12 14 / 0) 56%);
+  }
+  .lvl__head {
+    position: absolute;
+    left: var(--gutter);
+    right: var(--gutter);
+    bottom: calc(var(--gutter) * 1.1);
+    display: grid;
+    gap: 10px;
+    max-width: 760px;
+  }
+  .lvl__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    width: max-content;
+    margin-bottom: 8px;
+    padding: 7px 12px 7px 9px;
+    border-radius: 10px;
+    font-size: var(--fs-small);
+    font-weight: 520;
+    color: #fff;
+    background: rgb(255 255 255 / 0.14);
+    -webkit-backdrop-filter: blur(12px) saturate(1.5);
+    backdrop-filter: blur(12px) saturate(1.5);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3);
+    transition: background 0.4s var(--ease-out);
+  }
+  .lvl__back:hover { background: rgb(255 255 255 / 0.24); }
+  .lvl__back svg { width: 12px; height: 12px; }
+  .lvl__title {
+    display: grid;
+    gap: 2px;
+    width: max-content;
+    max-width: 100%;
+    view-transition-name: level-title;
+  }
+  .lvl__code { font-size: var(--fs-small); font-weight: 600; color: rgb(255 255 255 / 0.75); letter-spacing: var(--tracking); }
+  .lvl__name {
+    font-size: clamp(2.6rem, 1.4rem + 4.6vw, 5.4rem);
+    font-weight: 600;
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+  }
+  .lvl__sub { font-size: 1.0625rem; color: rgb(255 255 255 / 0.82); }
+  /* ---------------------------------------------------------- slider control */
+  .lvl__ctrl {
+    position: absolute;
+    right: var(--gutter);
+    bottom: calc(var(--gutter) * 1.1);
+    display: grid;
+    gap: 10px;
+    width: min(420px, calc(100vw - 2 * var(--gutter)));
+    animation: lvl-in 0.9s var(--ease-out) 0.5s both;
+  }
+  .lvl__cap {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 10px 10px 18px;
+    border-radius: 14px;
+    color: var(--ink);
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.78), rgb(255 255 255 / 0.62));
+    -webkit-backdrop-filter: blur(18px) saturate(1.5);
+    backdrop-filter: blur(18px) saturate(1.5);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.95), 0 14px 34px -14px rgb(0 0 0 / 0.45);
+  }
+  .lvl__count { font-size: var(--fs-small); color: var(--ink-3); font-variant-numeric: tabular-nums; padding-right: 14px; border-right: 1px solid var(--line); }
+  .lvl__count b { color: var(--accent-deep); font-weight: 600; }
+  .lvl__cap-txt { font-size: 1rem; font-weight: 560; letter-spacing: var(--tracking); line-height: 1.2; }
+  .lvl__cap-txt.is-swap { animation: lvl-cap 0.6s var(--ease-out); }
+  @keyframes lvl-cap { from { opacity: 0; transform: translateY(6px); } }
+  .lvl__next {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    color: #fff;
+    background: linear-gradient(180deg, var(--accent), var(--accent-deep));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.28), 0 6px 14px -6px rgb(var(--accent-rgb) / 0.6);
+    transition: transform 0.5s var(--ease-spring);
+  }
+  .lvl__next:hover { transform: translateX(2px); }
+  .lvl__next svg { width: 14px; height: 14px; }
+  .lvl__thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .lvl__thumb {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: 10px;
+    opacity: 0.62;
+    outline: 1.5px solid rgb(255 255 255 / 0.28);
+    outline-offset: -1.5px;
+    transition: opacity 0.5s var(--ease-out), outline-color 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+  }
+  .lvl__thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .lvl__thumb:hover { opacity: 0.9; }
+  .lvl__thumb.is-on { opacity: 1; outline-color: rgb(255 255 255 / 0.9); }
+  /* progress: a light line fills along the bottom of the active thumbnail */
+  .lvl__bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgb(255 255 255 / 0.25); }
+  .lvl__bar::after { content: ''; position: absolute; inset: 0; background: var(--accent); transform: scaleX(0); transform-origin: left; }
+  .lvl__thumb.is-on .lvl__bar::after { animation: lvl-fill var(--slide-ms) linear forwards; }
+  .lvl__ctrl.is-paused .lvl__thumb.is-on .lvl__bar::after { animation-play-state: paused; }
+  @keyframes lvl-fill { to { transform: scaleX(1); } }
+
+  .lvl__scroll {
+    position: absolute;
+    right: var(--gutter);
+    bottom: calc(var(--gutter) * 1.1);
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    font-size: var(--fs-small);
+    color: rgb(255 255 255 / 0.8);
+  }
+  .lvl__scroll i { position: relative; width: 1px; height: 40px; overflow: hidden; background: rgb(255 255 255 / 0.3); }
+  .lvl__scroll i::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    transform: translateY(-100%);
+    animation: lvl-scroll 2.4s var(--ease-in-out) infinite;
+  }
+  @keyframes lvl-scroll { 0% { transform: translateY(-100%); } 55% { transform: translateY(0); } 100% { transform: translateY(100%); } }
+
+  /* entrance (the hero itself arrives through the view transition) */
+  .lvl__back, .lvl__sub { animation: lvl-in 0.9s var(--ease-out) 0.35s both; }
+  @keyframes lvl-in { from { opacity: 0; transform: translateY(10px); } }
+
+  /* ---------------------------------------------------------- intro */
+  .lvl__intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: end;
+    padding: clamp(64px, 10vw, 140px) var(--gutter) clamp(48px, 7vw, 96px);
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+  .lvl__lead {
+    font-size: clamp(1.5rem, 1rem + 1.6vw, 2.35rem);
+    font-weight: 520;
+    line-height: 1.22;
+    letter-spacing: var(--tracking-tight);
+  }
+  .lvl__facts { display: grid; gap: 0; margin: 0; }
+  .lvl__fact {
+    display: grid;
+    grid-template-columns: 7.5rem 1fr;
+    align-items: baseline;
+    gap: 16px;
+    padding: 16px 0;
+    border-top: 1px solid var(--line);
+  }
+  .lvl__fact:last-child { border-bottom: 1px solid var(--line); }
+  .lvl__fact dt { font-size: 1.75rem; font-weight: 600; letter-spacing: var(--tracking-tight); font-variant-numeric: tabular-nums; }
+  .lvl__fact dd { margin: 0; color: var(--ink-2); }
+
+  /* ---------------------------------------------------------- other levels */
+  .lvl__others { padding: 0 var(--gutter) clamp(48px, 7vw, 96px); max-width: 1440px; margin: 0 auto; }
+  .lvl__label { margin-bottom: 16px; font-size: var(--fs-small); color: var(--ink-3); }
+  .lvl__others ul { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .lvl__card {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 8;
+    overflow: hidden;
+    border-radius: 14px;
+    color: #fff;
+  }
+  .lvl__card img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease-out); }
+  .lvl__card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgb(10 12 14 / 0.6), rgb(10 12 14 / 0) 60%); }
+  .lvl__card:hover img { transform: scale(1.04); }
+  .lvl__card-txt { position: absolute; z-index: 1; left: 20px; bottom: 18px; display: grid; gap: 2px; font-size: 1.25rem; font-weight: 600; letter-spacing: var(--tracking-tight); }
+  .lvl__card-txt b { font-size: var(--fs-small); font-weight: 600; color: rgb(255 255 255 / 0.75); }
+  .lvl__card-txt em { font-style: normal; font-size: var(--fs-small); font-weight: 420; color: rgb(255 255 255 / 0.8); }
+
+  /* ---------------------------------------------------------- cta */
+  .lvl__cta {
+    display: grid;
+    justify-items: center;
+    gap: 12px;
+    padding: clamp(56px, 8vw, 120px) var(--gutter) clamp(72px, 10vw, 140px);
+    text-align: center;
+    border-top: 1px solid var(--line);
+  }
+  .lvl__cta h2 { font-size: clamp(1.6rem, 1.1rem + 1.8vw, 2.6rem); font-weight: 600; letter-spacing: var(--tracking-tight); }
+  .lvl__cta p { color: var(--ink-2); }
+  .lvl__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    padding: 14px 22px;
+    border-radius: 10px;
+    color: #fff;
+    font-weight: 560;
+    background: linear-gradient(180deg, var(--accent), var(--accent-deep));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.28), 0 8px 20px -8px rgb(var(--accent-rgb) / 0.55);
+  }
+  .lvl__btn.is-soon { opacity: 0.85; }
+  .lvl__btn em { font-style: normal; font-size: 11px; font-weight: 500; padding: 2px 7px; border-radius: 6px; background: rgb(255 255 255 / 0.2); }
+
+  @media (max-width: 820px) {
+    .lvl__head { bottom: calc(var(--gutter) + 150px); }
+    .lvl__ctrl { left: var(--gutter); right: var(--gutter); width: auto; bottom: var(--gutter); }
+    .lvl__intro { grid-template-columns: 1fr; }
+    .lvl__others ul { grid-template-columns: 1fr; }
+    .lvl__scroll { display: none; }
+  }
+</style>
+
+<script>
+  // hero slider: advances when the active thumbnail's progress line has filled; pauses on hover / hidden tab
+  const ctrl = document.querySelector<HTMLElement>('[data-slider]');
+  const imgs = Array.from(document.querySelectorAll<HTMLImageElement>('[data-slide]'));
+  if (ctrl && imgs.length > 1) {
+    const thumbs = Array.from(ctrl.querySelectorAll<HTMLButtonElement>('[data-thumb]'));
+    const cap = ctrl.querySelector<HTMLElement>('[data-cap]')!;
+    const count = ctrl.querySelector<HTMLElement>('[data-count]')!;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let i = 0;
+    const show = (n: number) => {
+      const next = (n + imgs.length) % imgs.length;
+      if (next === i) return;
+      imgs[i].classList.remove('is-on'); imgs[i].classList.add('was-off');
+      thumbs[i].classList.remove('is-on'); thumbs[i].removeAttribute('aria-current');
+      i = next;
+      imgs[i].classList.add('is-on', 'was-off');
+      thumbs[i].classList.add('is-on'); thumbs[i].setAttribute('aria-current', 'true');
+      cap.textContent = thumbs[i].dataset.caption ?? '';
+      cap.classList.remove('is-swap'); void cap.offsetWidth; cap.classList.add('is-swap');
+      count.textContent = String(i + 1).padStart(2, '0');
+    };
+    thumbs.forEach((t, n) => {
+      t.addEventListener('click', () => show(n));
+      // the fill animation is the clock: when it ends, move on
+      t.querySelector('.lvl__bar')!.addEventListener('animationend', () => { if (!reduced && n === i) show(i + 1); });
+    });
+    ctrl.querySelector('[data-next]')!.addEventListener('click', () => show(i + 1));
+    const pause = (on: boolean) => ctrl.classList.toggle('is-paused', on || reduced);
+    ctrl.addEventListener('pointerenter', () => pause(true));
+    ctrl.addEventListener('pointerleave', () => pause(false));
+    document.addEventListener('visibilitychange', () => pause(document.hidden));
+    pause(false);
+  }
+</script>

@@ -1,0 +1,43 @@
+---
+/** «Яка програма догляду потрібна вашому авто?» — quiz CTA over floating tiles at depth (moved from home). */
+const m = '/media/';
+const img = (n: string, sm = false) => `${m}${n}${sm ? '-sm' : ''}.webp`;
+const floaters: [string, number, number, number, number, number][] = [
+  ['level-car-wash-v2-s1', 6, 14, 150, -8, 0.9], ['level-detailing-studio-v2-s3', 24, 6, 110, 6, 0.4], ['level-lounge-showroom-v2', 78, 8, 130, 9, 0.6],
+  ['level-detailing-studio-v2-s1', 90, 30, 160, -5, 1], ['level-car-wash-v2-s3', 3, 52, 120, 7, 0.5], ['level-detailing-studio-v2', 16, 78, 170, -4, 1],
+  ['level-lounge-showroom-v2-s2', 70, 70, 120, -9, 0.45], ['level-car-wash-v2-s2', 86, 82, 150, 5, 0.85], ['level-detailing-studio-v2-s2', 40, 90, 100, 8, 0.3],
+  ['level-lounge-showroom-v2-s3', 58, 4, 95, -6, 0.3],
+];
+const arrow = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+---
+
+  <!-- ============================================================ 5 · quiz with floating tiles at depth -->
+  <section class="dl-quiz" id="quiz" data-bg="#f6e4d6" data-theme="light">
+    <div class="dl-quiz__float" aria-hidden="true">
+      {floaters.map(([src, x, y, s, r, d]) => (
+        <figure style={`left:${x}%;top:${y}%;width:${s}px;--r:${r}deg;--blur:${((1 - d) * 5).toFixed(1)}px;--o:${(0.45 + d * 0.55).toFixed(2)}`} data-speed={d * 1.6}>
+          <img src={img(src, true)} alt="" loading="lazy" />
+        </figure>
+      ))}
+    </div>
+    <div class="dl-quiz__mid">
+      <p class="dl-body">Квіз VIK</p>
+      <h2 class="dl-serif dl-serif--l" data-up>Яка програма догляду<br />потрібна вашому авто?</h2>
+      <p class="dl-body" data-up>Від мийки до PPF — чотири питання, тридцять секунд і готова рекомендація з ціною.</p>
+      <div class="dl-cta dl-cta--c" data-up><a class="dl-pill dl-pill--dark" href="#">Пройти квіз</a><a class="dl-round dl-round--accent" href="#" aria-label="Пройти квіз" set:html={arrow} /></div>
+    </div>
+  </section>
+
+<style>
+  /* ---------------------------------------------------------- 5 quiz */
+  .dl-quiz { position: relative; height: 130vh; min-height: 900px; display: grid; place-items: center; }
+  .dl-quiz__float { position: absolute; inset: 0; }
+  .dl-quiz__float figure { position: absolute; margin: 0; padding: 6px; background: #fff; border-radius: 12px; rotate: var(--r); filter: blur(var(--blur)); opacity: var(--o); box-shadow: 0 24px 50px rgb(80 40 20 / 0.18); }
+  .dl-quiz__float img { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 8px; }
+  .dl-quiz__mid { position: relative; z-index: 2; display: grid; justify-items: center; gap: 24px; text-align: center; padding: 0 var(--gutter); }
+  .dl-quiz__mid > .dl-body:first-child { color: var(--ink); font-weight: 500; }
+
+  @media (max-width: 900px) {
+    .dl-quiz__float figure { width: 90px !important; }
+  }
+</style>

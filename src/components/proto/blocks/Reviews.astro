@@ -1,0 +1,137 @@
+---
+/** Відгуки Google — white Google-style review cards in one row with switchers (arrows, dots, swipe).
+ *  The reviews are SAMPLE copy for the mockup — before launch they must be replaced by real ones from the
+ *  Google Business profile (or a Places API widget); never publish these as genuine. */
+interface Props { isNew?: boolean }
+const { isNew = true } = Astro.props;
+const mapsUrl = 'https://www.google.com/maps/search/?api=1&query=34.7224344,33.0291954';
+// [initial, avatar colour, name, local-guide line, when, text, owner reply?]
+const reviews: [string, string, string, string, string, string, string?][] = [
+  ['А', '#1e8e3e', 'Андреас К.', 'Місцевий експерт · 34 відгуки', '2 тижні тому', 'Нарешті місце, де можна спокійно випити каву, поки миють авто. Прийняли з фото, видали з фото до і після — все прозоро. Лаунж нагорі просто топ.', 'Дякуємо, Андреасе! Чекаємо на наступну мийку.'],
+  ['M', '#7b1fa2', 'Maria P.', '12 відгуків', 'місяць тому', 'Did ceramic on my Range Rover — flawless finish and they explained the aftercare in detail. You can watch the progress from the lounge.'],
+  ['О', '#e8710a', 'Олексій Т.', 'Місцевий експерт · 58 відгуків', 'місяць тому', 'Оклеїли перед PPF, жодного пилу під плівкою. Майстер показав кожен кут під лампою і пояснив, як мити перші два тижні.', 'Дякуємо за довіру, Олексію!'],
+  ['Γ', '#1a73e8', 'Γιώργος Σ.', '7 відгуків', '2 місяці тому', 'Εξαιρετική δουλειά και πολύ ευγενικό προσωπικό. Το lounge είναι κορυφή — καφές και θέα ενώ περιμένεις.'],
+  ['I', '#d93025', 'Ирина В.', 'Местный эксперт · 21 отзыв', '2 місяці тому', 'Записалась на время — приехала, никакой очереди. Салон как новый, даже коврики помыли и высушили.'],
+  ['D', '#00897b', 'Daniel R.', '19 відгуків', '3 місяці тому', 'Tint and full detail in one day. The showroom view makes the wait feel short. Fair price, told upfront after the inspection.'],
+];
+const G = '<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.6 13.3l7.9 6.1C12.4 13.7 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.8c4.3-4 6.9-9.9 6.9-17.2z"/><path fill="#FBBC05" d="M10.5 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C.9 16.6 0 20.2 0 24s.9 7.4 2.6 10.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.8c-2.1 1.4-4.8 2.3-8.5 2.3-6.3 0-11.6-4.2-13.5-9.9l-7.9 6.1C6.6 42.6 14.6 48 24 48z"/></svg>';
+const star = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#FBBC04" d="M12 17.3l6.2 3.7-1.6-7 5.4-4.7-7.2-.6L12 2 9.2 8.7 2 9.3l5.4 4.7-1.6 7z"/></svg>';
+const stars = star.repeat(5);
+const prev = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 10H5m4.5-4.5L5 10l4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const next = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+---
+
+<section class="rv dl-sec" id="reviews" data-bg="#1d1815" data-theme="dark" data-rv>
+  {isNew && <span class="pt-new">Новий блок · Відгуки Google</span>}
+  <header class="rv__head">
+    <div class="rv__sum" data-up>
+      <span class="rv__g" set:html={G} />
+      <div>
+        <p class="rv__label">Відгуки Google</p>
+        <p class="rv__score"><b>5,0</b><span class="rv__stars" set:html={stars} /><span class="rv__cnt">6 відгуків</span></p>
+      </div>
+    </div>
+    <div class="rv__ctrl" data-up>
+      <a class="rv__write" href={mapsUrl} target="_blank" rel="noopener">Написати відгук</a>
+      <button class="rv__btn" type="button" data-rv-prev aria-label="Попередні відгуки" set:html={prev} />
+      <button class="rv__btn rv__btn--light" type="button" data-rv-next aria-label="Наступні відгуки" set:html={next} />
+    </div>
+  </header>
+
+  <div class="rv__track" data-rv-track>
+    {reviews.map(([ini, col, name, guide, when, text, reply]) => (
+      <article class="gr">
+        <header class="gr__top">
+          <span class="gr__ava" style={`background:${col}`}>{ini}</span>
+          <div class="gr__who"><b>{name}</b><span>{guide}</span></div>
+          <span class="gr__g" set:html={G} />
+        </header>
+        <div class="gr__meta"><span class="gr__stars" set:html={stars} /><span>{when}</span></div>
+        <p class="gr__text">{text}</p>
+        {reply && (
+          <div class="gr__reply"><b>Відповідь власника</b><span>{reply}</span></div>
+        )}
+        <footer class="gr__foot"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" d="M7 10v10H4V10zM7 10l4-7c1.4 0 2.3 1.1 2 2.4L12.4 9H19a2 2 0 0 1 2 2.3l-1.2 7A2 2 0 0 1 17.8 20H7"/></svg>Корисно</span><span>Поділитися</span></footer>
+      </article>
+    ))}
+  </div>
+
+  <div class="rv__dots" data-rv-dots>{reviews.map((_, i) => <button type="button" class:list={{ 'is-on': i === 0 }} aria-label={`Відгук ${i + 1}`} data-rv-dot={i}></button>)}</div>
+  <p class="rv__note pt-draft">Приклад вигляду — перед запуском підтягнемо реальні відгуки з Google</p>
+</section>
+
+<style>
+  .rv { position: relative; display: grid; gap: 34px; padding-right: 0; }
+  .rv__head { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding-right: var(--gutter); flex-wrap: wrap; }
+  .rv__sum { display: flex; align-items: center; gap: 16px; }
+  .rv__g { display: grid; place-items: center; width: 58px; height: 58px; border-radius: 16px; background: #fff; }
+  .rv__g :global(svg) { width: 32px; height: 32px; }
+  .rv__label { margin: 0 0 4px; font-size: 14px; color: var(--cream-2); }
+  .rv__score { margin: 0; display: flex; align-items: center; gap: 12px; }
+  .rv__score b { font-size: 40px; font-weight: 500; letter-spacing: -0.03em; line-height: 1; color: #fff; }
+  .rv__stars, .gr__stars { display: inline-flex; gap: 1px; }
+  .rv__stars :global(svg) { width: 22px; height: 22px; }
+  .rv__cnt { font-size: 14px; color: var(--cream-2); }
+  .rv__ctrl { display: flex; align-items: center; gap: 10px; }
+  .rv__write { display: inline-flex; align-items: center; height: 48px; padding: 0 22px; border-radius: 999px; font-size: 15px; font-weight: 500; color: #1a73e8; background: #fff; transition: background 0.3s; }
+  .rv__write:hover { background: #e8f0fe; }
+  .rv__btn { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; border: 0; cursor: pointer; color: var(--cream); background: rgb(255 255 255 / 0.08); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.2); transition: background 0.3s, opacity 0.3s; }
+  .rv__btn:hover { background: rgb(255 255 255 / 0.16); }
+  .rv__btn--light { background: var(--cream); color: var(--dk); }
+  .rv__btn--light:hover { background: #fff; }
+  .rv__btn:disabled { opacity: 0.35; cursor: default; }
+  .rv__btn :global(svg) { width: 20px; height: 20px; }
+
+  .rv__track { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none; padding: 4px var(--gutter) 8px 0; }
+  .rv__track::-webkit-scrollbar { display: none; }
+
+  /* a Google Maps review, as Google draws it */
+  .gr { flex: 0 0 min(380px, 84vw); scroll-snap-align: start; display: flex; flex-direction: column; gap: 12px; padding: 20px 22px 16px; border-radius: 14px; background: #fff; color: #202124; font-family: var(--font-sans); box-shadow: 0 1px 2px rgb(60 64 67 / 0.3), 0 2px 6px 2px rgb(60 64 67 / 0.15); }
+  .gr__top { display: flex; align-items: center; gap: 12px; }
+  .gr__ava { display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 50%; color: #fff; font-size: 18px; font-weight: 500; }
+  .gr__who { display: grid; gap: 1px; min-width: 0; }
+  .gr__who b { font-size: 15px; font-weight: 500; color: #202124; }
+  .gr__who span { font-size: 12.5px; color: #70757a; }
+  .gr__g { margin-left: auto; width: 20px; height: 20px; flex: none; }
+  .gr__g :global(svg) { width: 100%; height: 100%; }
+  .gr__meta { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #70757a; }
+  .gr__stars :global(svg) { width: 15px; height: 15px; }
+  .gr__text { margin: 0; font-size: 14.5px; line-height: 1.55; color: #3c4043; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+  .gr__reply { display: grid; gap: 4px; padding: 10px 12px; border-radius: 8px; background: #f1f3f4; font-size: 13px; color: #3c4043; }
+  .gr__reply b { font-weight: 500; color: #202124; }
+  .gr__foot span { display: inline-flex; align-items: center; gap: 6px; }
+  .gr__foot svg { width: 16px; height: 16px; }
+  .gr__foot { display: flex; gap: 18px; margin-top: auto; padding-top: 6px; font-size: 13px; color: #70757a; }
+
+  .rv__dots { display: flex; justify-content: center; gap: 8px; padding-right: var(--gutter); }
+  .rv__dots button { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px; background: rgb(255 255 255 / 0.25); cursor: pointer; transition: width 0.35s var(--ease-out), background 0.3s; }
+  .rv__dots button.is-on { width: 26px; background: #fff; }
+  .rv__note { margin: -14px 0 0; text-align: center; padding-right: var(--gutter); color: var(--cream-2); }
+
+  @media (max-width: 900px) {
+    .rv__head { flex-direction: column; align-items: flex-start; }
+    .rv__score b { font-size: 32px; }
+    .rv__write { height: 44px; padding: 0 18px; }
+    .rv__btn { width: 44px; height: 44px; }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-rv]').forEach((sec) => {
+    const tr = sec.querySelector<HTMLElement>('[data-rv-track]')!, cards = Array.from(tr.children) as HTMLElement[];
+    const dots = Array.from(sec.querySelectorAll<HTMLButtonElement>('[data-rv-dot]'));
+    const prev = sec.querySelector<HTMLButtonElement>('[data-rv-prev]')!, next = sec.querySelector<HTMLButtonElement>('[data-rv-next]')!;
+    const step = () => cards[0].offsetWidth + 16;
+    const idx = () => Math.round(tr.scrollLeft / step());
+    const go = (i: number) => tr.scrollTo({ left: Math.max(0, Math.min(cards.length - 1, i)) * step() });
+    prev.addEventListener('click', () => go(idx() - 1));
+    next.addEventListener('click', () => go(idx() + 1));
+    dots.forEach((d, i) => d.addEventListener('click', () => go(i)));
+    const sync = () => {
+      const i = idx(), max = tr.scrollWidth - tr.clientWidth;
+      dots.forEach((d, j) => d.classList.toggle('is-on', j === Math.min(i, dots.length - 1)));
+      prev.disabled = tr.scrollLeft < 4; next.disabled = tr.scrollLeft > max - 4;
+    };
+    tr.addEventListener('scroll', sync, { passive: true }); sync();
+  });
+</script>

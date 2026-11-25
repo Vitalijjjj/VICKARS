@@ -1,0 +1,54 @@
+---
+/** «Перший на Кіпрі, детейлінг, що дарує час» — statement over a depth collage (moved from the home page). */
+const m = '/media/';
+const img = (n: string, sm = false) => `${m}${n}${sm ? '-sm' : ''}.webp`;
+const collage: [string, number, number, number, number, number][] = [
+  ['level-car-wash-v2-s1', 2, 520, 210, -6, 0.6],
+  ['level-lounge-showroom-v2-s2', 83, 470, 200, 5, 0.9],
+  ['level-detailing-studio-v2-s3', 9, 820, 250, 3, 1.3],
+  ['level-detailing-studio-v2', 37, 880, 230, -2, 0.7],
+  ['level-lounge-showroom-v2', 66, 760, 270, -4, 1.1],
+  ['level-car-wash-v2-s3', 87, 990, 180, 7, 1.5],
+  ['level-detailing-studio-v2-s1', 20, 1100, 190, 6, 1.0],
+  ['level-car-wash-v2-s2', 54, 1120, 220, -7, 1.4],
+];
+const arrow = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+---
+
+  <!-- ============================================================ 1 · statement + floating collage (light → dark) -->
+  <section class="dl-sec dl-story" data-bg="#1d1815" data-theme="dark">
+    <div class="dl-story__collage" aria-hidden="true">
+      {collage.map(([src, x, y, w, r, d]) => (
+        <figure class="dl-polaroid" style={`left:${x}%;top:${y}px;width:${w}px;--r:${r}deg`} data-speed={d}>
+          <img src={img(src, true)} alt="" loading="lazy" decoding="async" />
+        </figure>
+      ))}
+    </div>
+    <div class="dl-story__head">
+      <h2 class="dl-display" data-lines>
+        <span class="ln"><span>Перший на Кіпрі,</span></span>
+        <span class="ln"><span>детейлінг <small>що</small> дарує</span></span>
+        <span class="ln"><span>час</span></span>
+      </h2>
+      <div class="dl-cta" data-up>
+        <a class="dl-pill" href="/levels/car-wash/#process">Як проходить візит</a><a class="dl-round" href="/levels/car-wash/#process" aria-label="Як проходить візит" set:html={arrow} />
+      </div>
+      <p class="dl-lead" data-up>Ручна мийка, детейлінг-студія і лаунж — в одній будівлі. Поки ви відпочиваєте нагорі, ваше авто проходить шлях від огляду до видачі.</p>
+    </div>
+  </section>
+
+<style>
+  /* ---------------------------------------------------------- 1 story */
+  .dl-story { min-height: 1320px; display: grid; justify-items: center; align-content: start; }
+  .dl-story__head { position: relative; z-index: 3; display: grid; justify-items: center; gap: 36px; }
+  .dl-story__head .dl-lead { text-align: center; }
+  .dl-story__collage { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+  .dl-polaroid { position: absolute; margin: 0; padding: 8px 8px 30px; background: #f7efe6; border-radius: 3px; box-shadow: 0 30px 60px rgb(0 0 0 / 0.45); rotate: var(--r); }
+  .dl-polaroid img { display: block; width: 100%; aspect-ratio: 4 / 3.2; object-fit: cover; filter: sepia(0.25) saturate(0.85); }
+
+  @media (max-width: 900px) {
+    .dl-story { min-height: 1150px; }
+    .dl-story__collage figure:nth-child(n+6) { display: none; }
+    .dl-polaroid { width: 140px !important; }
+  }
+</style>

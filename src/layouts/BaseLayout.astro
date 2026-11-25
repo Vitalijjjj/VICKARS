@@ -1,0 +1,42 @@
+---
+import '@/styles/global.css';
+import LiquidGlassHeader from '@/components/header/LiquidGlassHeader.astro';
+import SiteFooter from '@/components/SiteFooter.astro';
+import { locales, localePath, useTranslations, type Locale } from '@/i18n/ui';
+
+interface Props {
+  locale: Locale;
+  path?: string;     // locale-relative path of this page, for hreflang + switcher
+  title?: string;    // defaults to the site title
+  preload?: string;  // hero image to preload
+  footer?: boolean;  // render the site footer (default true)
+  noindex?: boolean;
+}
+
+const { locale, path = '/', title, preload = '/media/vikcars-render-v3-1.png', footer = true, noindex = false } = Astro.props;
+const t = useTranslations(locale);
+const htmlLang = { uk: 'uk', ru: 'ru', el: 'el' }[locale];
+---
+
+<!doctype html>
+<html lang={htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#faf2e9" />
+    <title>{title ?? t('meta.title')}</title>
+    <meta name="description" content={t('meta.description')} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    {locales.map((l) => <link rel="alternate" hreflang={l} href={new URL(localePath(l, path), Astro.site)} />)}
+    <link rel="preload" href={preload} as="image" fetchpriority="high" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231b1a17'/%3E%3Cpath d='M7 10l3.2 12L16 12l5.8 10L25 10' fill='none' stroke='%23faf2e9' stroke-width='2.2' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  </head>
+  <body>
+    <LiquidGlassHeader locale={locale} path={path} />
+    <main id="main">
+      <slot />
+    </main>
+    {footer && <SiteFooter locale={locale} path={path} />}
+  </body>
+</html>

@@ -1,0 +1,47 @@
+---
+/** «Захист від кіпрського сонця, солі і пилу» — line-art ornament section (moved from home). */
+const arrow = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+---
+
+  <!-- ============================================================ 7 · protection: line-art ornament (light → dark) -->
+  <section class="dl-protect" data-bg="#151a19" data-theme="dark">
+    <svg class="dl-ornament" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true" data-ornament>
+      <g fill="none" stroke="currentColor" stroke-width="1.2">
+        <circle cx="720" cy="300" r="70" /><circle cx="720" cy="300" r="110" stroke-dasharray="3 9" />
+        {Array.from({ length: 24 }, (_, i) => { const a = (i / 24) * Math.PI * 2; return <line x1={720 + Math.cos(a) * 130} y1={300 + Math.sin(a) * 130} x2={720 + Math.cos(a) * (i % 2 ? 175 : 210)} y2={300 + Math.sin(a) * (i % 2 ? 175 : 210)} />; })}
+        <path d="M250 700 C 330 600, 470 560, 600 560 L 860 560 C 980 560, 1090 610, 1190 700" />
+        <path d="M230 720 L 1210 720 M310 720 a 60 60 0 0 1 120 0 M1010 720 a 60 60 0 0 1 120 0" />
+        <path d="M120 820 C 300 780, 520 800, 720 820 S 1140 860, 1320 820" stroke-dasharray="2 8" />
+        <path d="M80 200 q 60 -60 120 0 t 120 0 M1120 200 q 60 -60 120 0 t 120 0" />
+        <path d="M60 520 l 60 -40 l 60 40 l -60 40 z M1260 520 l 60 -40 l 60 40 l -60 40 z" />
+      </g>
+    </svg>
+    <div class="dl-protect__in">
+      <p class="dl-eyebrow">PPF · кераміка · тонування</p>
+      <h2 class="dl-display" data-lines>
+        <span class="ln"><span>Захист <small>від</small></span></span>
+        <span class="ln"><span>кіпрського сонця,</span></span>
+        <span class="ln"><span><small>солі і</small> пилу</span></span>
+      </h2>
+      <div class="dl-cta dl-cta--c" data-up><a class="dl-pill dl-pill--mint" href="#pricing">Обрати захист</a><a class="dl-round dl-round--ghost" href="#pricing" aria-label="Обрати захист" set:html={arrow} /></div>
+    </div>
+  </section>
+
+<style>
+  /* ---------------------------------------------------------- 7 protect */
+  .dl-protect { position: relative; min-height: 110vh; display: grid; place-items: center; overflow: hidden; }
+  .dl-ornament { position: absolute; inset: 0; width: 100%; height: 100%; color: rgb(223 243 228 / 0.22); }
+  .dl-protect__in { position: relative; display: grid; gap: 36px; padding: 140px var(--gutter); }
+  .dl-protect .dl-display { color: var(--mint); }
+
+  .dl-protect .dl-eyebrow { text-align: center; }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+  const g = document.querySelector('[data-ornament] g');
+  if (g && !matchMedia('(prefers-reduced-motion: reduce)').matches)
+    gsap.to(g, { rotate: 6, transformOrigin: '50% 33%', ease: 'none', scrollTrigger: { trigger: '.dl-protect', start: 'top bottom', end: 'bottom top', scrub: true } });
+</script>

@@ -1,0 +1,126 @@
+@import '@fontsource-variable/inter-tight/wght.css';
+@import '@fontsource-variable/inter-tight/wght-italic.css';
+@import '@fontsource/jetbrains-mono/400.css';
+
+/* ---------------------------------------------------------------- tokens */
+:root {
+  /* Paper = exact background of the intro video's first frames, so the stage edge is invisible. */
+  --paper: #faf2e9;
+  --paper-deep: #f1e8dc;
+  --ink: #1b1a17;
+  --ink-2: #4a4740;
+  --ink-3: #8a857b;
+  --line: rgb(27 26 23 / 0.14);
+  --concrete: #cfc8bd;
+  --glow: rgb(255 251 243);
+
+  /* brand accent — VIK Cars badge red (Vikcars.pdf), deep = its type shadow */
+  --accent: #e52532;
+  --accent-deep: #c02229;
+  --accent-rgb: 229 37 50;
+
+  --font-sans: 'Inter Tight Variable', 'Inter Tight', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Inter Tight tracking: −1% for running text and UI, −2% for larger type (≥17px) */
+  --tracking: -0.01em;
+  --tracking-tight: -0.02em;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.36, 0.64, 1);
+
+  --gutter: clamp(16px, 3.2vw, 48px);
+  --header-top: clamp(14px, 1.6vw, 22px);
+  --header-h: 60px;
+
+  --fs-micro: 0.6875rem;   /* 11px */
+  --fs-small: 0.8125rem;   /* 13px */
+  --fs-body: 0.9375rem;    /* 15px */
+  --fs-title: clamp(1.5rem, 1.1rem + 1.4vw, 2.25rem);
+
+  color-scheme: light;
+}
+
+@media (max-width: 720px) {
+  :root { --header-h: 54px; }
+}
+
+/* ---------------------------------------------------------------- base */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  background: var(--paper);
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  font-weight: 420;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+
+/* tracking is set per element (not inherited as px), so −1% stays −1% at every font size;
+   zero specificity — any component rule (mono labels, logo wordmark, −2% titles) overrides it */
+:where(body, body *) { letter-spacing: var(--tracking); }
+
+img, video, svg { display: block; max-width: 100%; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+ul, ol { list-style: none; margin: 0; padding: 0; }
+h1, h2, h3, p { margin: 0; }
+
+:focus-visible {
+  outline: 1.5px solid var(--ink);
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
+::selection { background: rgb(var(--accent-rgb) / 0.16); }
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.04em;
+  font-feature-settings: 'zero' 0;
+}
+
+/* Planned (not yet built) destinations: visible, but clearly not links. */
+[aria-disabled='true'] { cursor: default; }
+
+/* ---------------------------------------------------------------- page transitions
+   Cross-document view transitions (Chromium, Safari 18.2+): the header stays put, the level "window" and the
+   level title morph between the building and the level landing. Elsewhere navigation is instant. */
+@view-transition { navigation: auto; }
+::view-transition-group(*) { animation-duration: 0.7s; animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.45s; }
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

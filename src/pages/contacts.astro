@@ -1,0 +1,66 @@
+---
+/** «Як нас знайти + контакти» (UA, new design). Light intro with route cards → big map with the contact card →
+ *  booking bar → glass footer. noindex. */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import '@/styles/proto.css';
+import ContactsMap from '@/components/proto/blocks/ContactsMap.astro';
+import Ambience from '@/components/proto/blocks/Ambience.astro';
+import Directions from '@/components/proto/blocks/Directions.astro';
+import Tariffs from '@/components/proto/blocks/Tariffs.astro';
+import GlassFooter from '@/components/proto/blocks/GlassFooter.astro';
+import { business } from '@/config/business';
+const tel = business.phone ? `tel:${business.phone.replace(/\s/g, '')}` : '#';
+const routes = [
+  ['Від центру Лімасолу', '≈ 15 хв', 'Прибережною дорогою на схід, з’їзд на …'],
+  ['З траси A1', '≈ 5 хв', 'З’їзд № … , далі за вказівниками VIK Cars'],
+  ['Паркування', 'на території', 'Гостьові місця перед входом, авто приймаємо на 00'],
+];
+---
+
+<BaseLayout locale="uk" path="/contacts/" title="Як нас знайти — VIK Cars, Лімасол" footer={false}>
+  <div class="dl" data-pt>
+    <Ambience />
+    <section class="ch dl-sec" data-bg="#f6e4d6" data-theme="light">
+      <p class="dl-eyebrow ch__eye" data-up>Лімасол · Кіпр</p>
+      <h1 class="dl-display" data-lines><span class="ln"><span>Як нас <small>знайти</small></span></span></h1>
+      <div class="ch__quick" data-up>
+        <a href={tel}><small>Телефон</small>{business.phone}</a>
+        <span><small>Графік</small>Щодня {business.hours}</span>
+        <a href={business.mapsUrl ?? '#'} target="_blank" rel="noopener"><small>Навігатор</small>Відкрити маршрут ↗</a>
+      </div>
+      <ol class="ch__routes">
+        {routes.map(([t, time, d], i) => (
+          <li data-up><span class="dl-num">{String(i + 1).padStart(2, '0')}</span><h3>{t}</h3><b>{time}</b><p>{d} <span class="pt-draft">уточнимо</span></p></li>
+        ))}
+      </ol>
+    </section>
+    <ContactsMap isNew={false} tall title={false} />
+    <Directions />
+    <Tariffs isNew={false} />
+    <GlassFooter />
+  </div>
+</BaseLayout>
+
+<style>
+  .ch { display: grid; justify-items: center; gap: clamp(28px, 4vw, 48px); padding-top: calc(var(--header-h) + clamp(90px, 10vw, 150px)); }
+  .ch__eye { margin: 0; }
+  .ch__quick { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+  .ch__quick > * { display: grid; gap: 2px; padding: 14px 24px; border-radius: 18px; background: #fff; font-size: 19px; letter-spacing: -0.02em; color: var(--ink); box-shadow: 0 10px 30px rgb(80 40 20 / 0.06); }
+  .ch__quick small { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
+  .ch__routes { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; max-width: 1180px; margin: 20px 0 0; padding: 0; list-style: none; border-top: 1px solid rgb(36 28 23 / 0.14); }
+  .ch__routes li { display: grid; gap: 8px; padding: 26px 26px 0 0; }
+  .ch__routes li + li { padding-left: 26px; border-left: 1px solid rgb(36 28 23 / 0.14); }
+  .ch__routes .dl-num { font-size: 34px; line-height: 1; }
+  .ch__routes h3 { margin: 0; font-size: 21px; font-weight: 500; letter-spacing: -0.025em; color: var(--ink); }
+  .ch__routes b { font-weight: 200; font-style: italic; font-size: 22px; color: var(--ink); }
+  .ch__routes p { margin: 0; font-size: 15px; color: var(--ink-2); }
+  @media (max-width: 900px) {
+    .ch__routes { grid-template-columns: 1fr; }
+    .ch__routes li + li { padding-left: 0; border-left: 0; border-top: 1px solid rgb(36 28 23 / 0.14); padding-top: 20px; }
+  }
+</style>
+
+<script>
+  import { initProto } from '@/scripts/proto';
+  initProto();
+</script>
